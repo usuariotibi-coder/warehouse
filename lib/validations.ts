@@ -77,3 +77,24 @@ export const UsuarioSchema = z.object({
 export const PrecioLoteSchema = z.object({
   precioUnitario: z.number().positive(),
 })
+
+export const CambiarPasswordSchema = z
+  .object({
+    passwordActual: z.string().min(1, 'La contraseña actual es requerida'),
+    passwordNueva: z
+      .string()
+      .min(10, 'Mínimo 10 caracteres')
+      .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
+      .regex(/[a-z]/, 'Debe contener al menos una minúscula')
+      .regex(/[0-9]/, 'Debe contener al menos un número')
+      .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
+    passwordConfirmar: z.string().min(1, 'Confirma la nueva contraseña'),
+  })
+  .refine((d) => d.passwordNueva === d.passwordConfirmar, {
+    message: 'Las contraseñas no coinciden',
+    path: ['passwordConfirmar'],
+  })
+  .refine((d) => d.passwordActual !== d.passwordNueva, {
+    message: 'La nueva contraseña debe ser diferente a la actual',
+    path: ['passwordNueva'],
+  })
