@@ -28,7 +28,6 @@ export default function NuevaEntradaPage() {
   const router = useRouter()
   const [articulos, setArticulos] = useState<Articulo[]>([])
   const [ubicaciones, setUbicaciones] = useState<Ubicacion[]>([])
-  const [proveedorNombre, setProveedorNombre] = useState('')
   const [notas, setNotas] = useState('')
   const [lotes, setLotes] = useState<LoteItem[]>([{ articuloId: '', ubicacionId: '', nivelId: '', cantidadOriginal: 1 }])
   const [saving, setSaving] = useState(false)
@@ -71,7 +70,6 @@ export default function NuevaEntradaPage() {
     }
     setSaving(true)
     const payload = {
-      proveedorNombre: proveedorNombre || undefined,
       notas: notas || undefined,
       lotes: lotes.map(l => ({
         articuloId: l.articuloId,
@@ -100,12 +98,6 @@ export default function NuevaEntradaPage() {
     <div className="max-w-2xl space-y-5">
       <div className="card-industrial p-5 space-y-4">
         <h2 className="font-display text-lg font-semibold">Datos generales</h2>
-        <Input
-          label="Proveedor (opcional)"
-          value={proveedorNombre}
-          onChange={(e) => setProveedorNombre(e.target.value)}
-          placeholder="Nombre del proveedor"
-        />
         <Input label="Notas (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
       </div>
 

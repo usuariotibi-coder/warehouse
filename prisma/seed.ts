@@ -38,13 +38,6 @@ async function main() {
     })
   }
 
-  await prisma.proveedor.create({
-    data: {
-      nombre: 'Proveedor General',
-      contacto: 'contacto@proveedor.com',
-    },
-  }).catch(() => {})
-
   console.log('Seed completado.')
 }
 

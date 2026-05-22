@@ -16,7 +16,6 @@ interface Entrada {
   fecha: string
   notas?: string | null
   usuario: { nombre: string }
-  proveedor?: { nombre: string } | null
   lotes: Array<{
     id: string
     cantidadOriginal: number
@@ -86,11 +85,6 @@ export default function EntradaDetailPage() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
               {formatDateTime(entrada.fecha)} · por {entrada.usuario.nombre}
             </p>
-            {entrada.proveedor && (
-              <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                Proveedor: {entrada.proveedor.nombre}
-              </p>
-            )}
           </div>
           {rol === 'ADMIN' && sinPrecio && (
             <Button onClick={() => setShowPrecioModal(true)}>

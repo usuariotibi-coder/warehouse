@@ -27,19 +27,24 @@ export async function POST(req: Request) {
   try {
     const resultado = await prisma.$transaction(async (tx) => {
       if (tipo === 'entrada') {
-        const proveedorNombre = filasValidas[0]?.resolvedData.proveedorNombre
         const entrada = await tx.entrada.create({
-          data: { usuarioId: userId!, proveedorNombre, notas },
+          data: { usuarioId: userId!, notas },
         })
 
         for (const fila of filasValidas) {
           const { articuloId, nivelId, ubicacionId, cantidad } = fila.resolvedData
-          if (!articuloId || !cantidad) continue
+          if (!cantidad) continue
 
           let artId = articuloId
           if (!artId) {
+            const nombreParaCrear = fila.originalData['articulo_nombre'] || fila.originalData['numero_parte']
+            if (!nombreParaCrear) continue
             const art = await tx.articulo.create({
-              data: { nombre: fila.originalData['articulo_nombre'], marca: fila.originalData['marca'] || undefined },
+              data: {
+                nombre: nombreParaCrear,
+                marca: fila.originalData['marca'] || undefined,
+                numeroParte: fila.originalData['numero_parte'] || undefined,
+              },
             })
             artId = art.id
           }

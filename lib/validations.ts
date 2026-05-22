@@ -14,13 +14,6 @@ export const UbicacionSchema = z.object({
   descripcion: z.string().optional(),
 })
 
-export const ProveedorSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido'),
-  contacto: z.string().optional(),
-  telefono: z.string().optional(),
-  email: z.string().email().optional().or(z.literal('')),
-  notas: z.string().optional(),
-})
 
 export const ProyectoSchema = z.object({
   nombre: z.string().min(1, 'El nombre es requerido'),
@@ -39,7 +32,6 @@ export const LoteEntradaSchema = z.object({
 })
 
 export const EntradaSchema = z.object({
-  proveedorNombre: z.string().optional(),
   notas: z.string().optional(),
   lotes: z.array(LoteEntradaSchema).min(1, 'Debe haber al menos un artículo'),
 })

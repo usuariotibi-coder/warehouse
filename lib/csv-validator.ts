@@ -10,7 +10,6 @@ export interface CSVRowValidated {
     articuloId?: string
     nivelId?: string
     ubicacionId?: string
-    proveedorNombre?: string
     proyectoId?: string
     cantidad?: number
   }
@@ -87,16 +86,16 @@ export async function validarCSV(
     const artNumeroParte = row['numero_parte'] ?? ''
     const cantidadStr = row['cantidad'] ?? ''
 
-    if (!artNombre) {
-      errors.push('articulo_nombre es requerido')
+    if (!artNombre && !artNumeroParte) {
+      errors.push('Se requiere articulo_nombre o numero_parte')
     } else {
-      let articulo = articuloMap.get(artNombre.toLowerCase())
-      if (!articulo && artNumeroParte) {
-        articulo = articuloByNumeroParte.get(artNumeroParte.toLowerCase())
+      let articulo = artNumeroParte
+        ? articuloByNumeroParte.get(artNumeroParte.toLowerCase())
+        : undefined
+      if (!articulo && artNombre) {
+        articulo = articuloMap.get(artNombre.toLowerCase())
       }
-      if (!articulo) {
-        warnings.push(`Artículo "${artNombre}" no existe — se creará automáticamente`)
-      } else {
+      if (articulo) {
         resolvedData.articuloId = articulo.id
         if (artMarca && articulo.marca && articulo.marca.toLowerCase() !== artMarca.toLowerCase()) {
           warnings.push(`Marca "${artMarca}" no coincide con la registrada ("${articulo.marca}")`)
@@ -115,7 +114,9 @@ export async function validarCSV(
       const ubNombre = row['ubicacion'] ?? ''
       const nivNombre = row['nivel'] ?? ''
 
-      if (ubNombre) {
+      if (!ubNombre) {
+        warnings.push('No se especificó ubicación')
+      } else {
         const ub = ubicacionMap.get(ubNombre.toLowerCase())
         if (!ub) {
           errors.push(`Ubicación "${ubNombre}" no existe`)
@@ -129,18 +130,11 @@ export async function validarCSV(
               resolvedData.nivelId = nivel.id
             }
           } else {
-            const n1 = ub.niveles[0]
-            if (n1) {
-              resolvedData.nivelId = n1.id
-              warnings.push(`No se especificó nivel — se usará ${n1.nombre}`)
-            }
+            warnings.push('No se especificó nivel')
           }
         }
       }
 
-      if (row['proveedor_nombre']) {
-        resolvedData.proveedorNombre = row['proveedor_nombre']
-      }
     }
 
     if (tipo === 'salida' || tipo === 'apartado') {

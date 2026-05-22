@@ -27,7 +27,6 @@ interface Articulo {
     entrada: {
       fecha: string
       usuario: { nombre: string }
-      proveedorNombre?: string | null
     }
   }>
   movimientos: Array<{
@@ -122,7 +121,6 @@ export default function ArticuloDetailPage() {
                   </div>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                     Por {lote.entrada.usuario.nombre}
-                    {lote.entrada.proveedorNombre && ` · ${lote.entrada.proveedorNombre}`}
                   </p>
                 </div>
                 <div className="text-right">

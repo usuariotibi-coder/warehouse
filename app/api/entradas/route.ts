@@ -52,11 +52,11 @@ export async function POST(req: Request) {
   const parsed = EntradaSchema.safeParse(body)
   if (!parsed.success) return errorResponse(parsed.error.issues[0].message, 'VALIDATION_ERROR')
 
-  const { proveedorNombre, notas, lotes } = parsed.data
+  const { notas, lotes } = parsed.data
 
   const entrada = await prisma.$transaction(async (tx) => {
     const entrada = await tx.entrada.create({
-      data: { usuarioId: userId!, proveedorNombre, notas },
+      data: { usuarioId: userId!, notas },
     })
 
     for (const lote of lotes) {

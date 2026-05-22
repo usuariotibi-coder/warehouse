@@ -1,12 +1,15 @@
 'use client'
 
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect } from 'react'
 import { Button } from '@/components/ui/Button'
 import { toast } from 'sonner'
 import { Upload, Download, CheckCircle, AlertTriangle, XCircle, X, ChevronRight } from 'lucide-react'
 import type { CSVRowValidated } from '@/lib/csv-validator'
 
 export type TipoCSV = 'entrada' | 'salida' | 'apartado'
+
+interface Nivel { id: string; nombre: string }
+interface Ubicacion { id: string; nombre: string; niveles: Nivel[] }
 
 interface CSVUploaderProps {
   tipo: TipoCSV
@@ -39,13 +42,19 @@ const ROW_BORDER: Record<CSVRowValidated['status'], string> = {
 }
 
 export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
-  const [paso, setPaso] = useState<1 | 2 | 3>(1)
+  const [paso, setPaso] = useState<1 | 2 | 3>(2)
   const [dragging, setDragging] = useState(false)
   const [validating, setValidating] = useState(false)
   const [processing, setProcessing] = useState(false)
   const [filas, setFilas] = useState<CSVRowValidated[]>([])
   const [seleccionadas, setSeleccionadas] = useState<Set<number>>(new Set())
+  const [ubicaciones, setUbicaciones] = useState<Ubicacion[]>([])
+  const [overrides, setOverrides] = useState<Record<number, { ubicacionId?: string; nivelId?: string }>>({})
   const fileRef = useRef<HTMLInputElement>(null)
+
+  useEffect(() => {
+    fetch('/api/ubicaciones').then(r => r.json()).then(setUbicaciones).catch(() => {})
+  }, [])
 
   async function procesarArchivo(file: File) {
     const text = await file.text()
@@ -90,8 +99,29 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
     setSeleccionadas(prev => { const next = new Set(prev); next.delete(rowNumber); return next })
   }
 
+  function setOverrideUbicacion(rowNumber: number, ubicacionId: string) {
+    setOverrides(prev => ({ ...prev, [rowNumber]: { ubicacionId, nivelId: undefined } }))
+  }
+
+  function setOverrideNivel(rowNumber: number, nivelId: string) {
+    setOverrides(prev => ({ ...prev, [rowNumber]: { ...prev[rowNumber], nivelId } }))
+  }
+
   async function procesar() {
-    const filasSeleccionadas = filas.filter(f => seleccionadas.has(f.rowNumber))
+    const filasSeleccionadas = filas
+      .filter(f => seleccionadas.has(f.rowNumber))
+      .map(f => {
+        const ov = overrides[f.rowNumber]
+        if (!ov) return f
+        return {
+          ...f,
+          resolvedData: {
+            ...f.resolvedData,
+            ...(ov.ubicacionId ? { ubicacionId: ov.ubicacionId } : {}),
+            ...(ov.nivelId ? { nivelId: ov.nivelId } : {}),
+          },
+        }
+      })
     if (!filasSeleccionadas.length) { toast.error('No hay filas seleccionadas'); return }
 
     setProcessing(true)
@@ -179,9 +209,20 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
 
         {paso === 2 && (
           <div className="space-y-4">
-            <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Arrastra tu archivo CSV o haz clic para seleccionarlo.
-            </p>
+            <div className="flex items-center justify-between">
+              <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                Arrastra tu archivo CSV o haz clic para seleccionarlo.
+              </p>
+              <a
+                href={TEMPLATE_URLS[tipo]}
+                download
+                className="flex items-center gap-1.5 text-xs transition-colors hover:opacity-80"
+                style={{ color: 'var(--accent-cyan)' }}
+              >
+                <Download size={12} />
+                Descargar plantilla
+              </a>
+            </div>
             <div
               onDragOver={(e) => { e.preventDefault(); setDragging(true) }}
               onDragLeave={() => setDragging(false)}
@@ -259,6 +300,51 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                     {fila.warnings.map((w, i) => (
                       <p key={i} className="text-xs" style={{ color: 'var(--accent-warning)' }}>⚠ {w}</p>
                     ))}
+
+                    {/* Selector de ubicación */}
+                    {fila.warnings.includes('No se especificó ubicación') && (
+                      <div className="mt-2 flex items-center gap-2 flex-wrap">
+                        <select
+                          value={overrides[fila.rowNumber]?.ubicacionId ?? ''}
+                          onChange={e => setOverrideUbicacion(fila.rowNumber, e.target.value)}
+                          className="px-2 py-1 rounded text-xs border outline-none"
+                          style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 140 }}
+                        >
+                          <option value="">Seleccionar ubicación...</option>
+                          {ubicaciones.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
+                        </select>
+                        {overrides[fila.rowNumber]?.ubicacionId && (
+                          <select
+                            value={overrides[fila.rowNumber]?.nivelId ?? ''}
+                            onChange={e => setOverrideNivel(fila.rowNumber, e.target.value)}
+                            className="px-2 py-1 rounded text-xs border outline-none"
+                            style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 120 }}
+                          >
+                            <option value="">Seleccionar nivel...</option>
+                            {ubicaciones.find(u => u.id === overrides[fila.rowNumber]?.ubicacionId)?.niveles.map(n => (
+                              <option key={n.id} value={n.id}>{n.nombre}</option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Selector de nivel (ubicación ya resuelta en CSV) */}
+                    {fila.warnings.includes('No se especificó nivel') && fila.resolvedData.ubicacionId && (
+                      <div className="mt-2">
+                        <select
+                          value={overrides[fila.rowNumber]?.nivelId ?? ''}
+                          onChange={e => setOverrideNivel(fila.rowNumber, e.target.value)}
+                          className="px-2 py-1 rounded text-xs border outline-none"
+                          style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 140 }}
+                        >
+                          <option value="">Seleccionar nivel...</option>
+                          {ubicaciones.find(u => u.id === fila.resolvedData.ubicacionId)?.niveles.map(n => (
+                            <option key={n.id} value={n.id}>{n.nombre}</option>
+                          ))}
+                        </select>
+                      </div>
+                    )}
 
                     {fila.ubicacionSugerida && (
                       <div className="mt-1 flex items-center gap-2">

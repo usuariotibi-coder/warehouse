@@ -13,7 +13,6 @@ import { motion } from 'framer-motion'
 interface Entrada {
   id: string
   fecha: string
-  proveedorNombre?: string | null
   usuario: { nombre: string }
   lotes: Array<{
     id: string
@@ -65,7 +64,7 @@ export default function EntradasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Fecha', 'Artículos', 'Proveedor', 'Almacenista', 'Estado', ''].map((h) => (
+                {['Fecha', 'Artículos', 'Almacenista', 'Estado', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -95,9 +94,6 @@ export default function EntradasPage() {
                           <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{e.lotes.length - 2} más</p>
                         )}
                       </div>
-                    </td>
-                    <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
-                      {e.proveedorNombre ?? '—'}
                     </td>
                     <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
                       {e.usuario.nombre}

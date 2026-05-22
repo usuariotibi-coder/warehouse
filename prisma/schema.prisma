@@ -112,17 +112,6 @@ model ArticuloNivel {
   @@index([articuloId])
 }
 
-model Proveedor {
-  id        String   @id @default(cuid())
-  nombre    String
-  contacto  String?
-  telefono  String?
-  email     String?
-  notas     String?
-  activo    Boolean  @default(true)
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-}
 
 model Proyecto {
   id          String         @id @default(cuid())
@@ -181,7 +170,6 @@ model Entrada {
   id              String    @id @default(cuid())
   fecha           DateTime  @default(now())
   usuarioId       String
-  proveedorNombre String?
   notas           String?
   createdAt       DateTime  @default(now())
 

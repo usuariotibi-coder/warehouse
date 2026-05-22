@@ -39,7 +39,6 @@ export async function GET(req: Request) {
       Unidad: l.articulo.unidad,
       'Precio unitario': l.precioUnitario ?? 'Sin precio',
       'Total lote': l.precioUnitario ? (l.cantidadOriginal * l.precioUnitario).toFixed(2) : '—',
-      Proveedor: e.proveedorNombre ?? '—',
       Almacenista: e.usuario.nombre,
     }))
   )

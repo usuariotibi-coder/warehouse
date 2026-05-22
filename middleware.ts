@@ -13,7 +13,7 @@ export default withAuth(
     const rol = token.rol as string
 
     const adminOnly = ['/dashboard', '/usuarios', '/reportes']
-    const almacenistaPlus = ['/entradas', '/salidas', '/ubicaciones', '/proveedores']
+    const almacenistaPlus = ['/entradas', '/salidas', '/ubicaciones']
 
     if (adminOnly.some((r) => pathname.startsWith(r)) && rol !== 'ADMIN') {
       return NextResponse.redirect(new URL('/almacen', req.url))
@@ -45,7 +45,6 @@ export const config = {
     '/articulos/:path*',
     '/ubicaciones/:path*',
     '/proyectos/:path*',
-    '/proveedores/:path*',
     '/reportes/:path*',
     '/usuarios/:path*',
     '/perfil/:path*',
