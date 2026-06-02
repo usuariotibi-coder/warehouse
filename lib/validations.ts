@@ -28,7 +28,7 @@ export const LoteEntradaSchema = z.object({
   articuloId: z.string().min(1),
   ubicacionId: z.string().optional(),
   nivelId: z.string().optional(),
-  cantidadOriginal: z.number().int().positive(),
+  cantidadOriginal: z.number().positive(),
 })
 
 export const EntradaSchema = z.object({
@@ -38,7 +38,7 @@ export const EntradaSchema = z.object({
 
 export const SalidaItemSchema = z.object({
   articuloId: z.string().min(1),
-  cantidad: z.number().int().positive(),
+  cantidad: z.number().positive(),
 })
 
 export const SalidaSchema = z.object({
@@ -50,7 +50,7 @@ export const SalidaSchema = z.object({
 
 export const ApartadoItemSchema = z.object({
   articuloId: z.string().min(1),
-  cantidad: z.number().int().positive(),
+  cantidad: z.number().positive(),
 })
 
 export const ApartadoSchema = z.object({

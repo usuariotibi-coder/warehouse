@@ -101,7 +101,7 @@ model ArticuloNivel {
   id         String   @id @default(cuid())
   nivelId    String
   articuloId String
-  cantidad   Int      @default(0)
+  cantidad   Float    @default(0)
   updatedAt  DateTime @updatedAt
 
   nivel    Nivel    @relation(fields: [nivelId], references: [id])
@@ -155,7 +155,7 @@ model ArticuloUbicacion {
   id          String   @id @default(cuid())
   articuloId  String
   ubicacionId String
-  cantidad    Int      @default(0)
+  cantidad    Float    @default(0)
   updatedAt   DateTime @updatedAt
 
   articulo  Articulo  @relation(fields: [articuloId], references: [id])
@@ -186,8 +186,8 @@ model LoteEntrada {
   articuloId         String
   ubicacionId        String?
   nivelId            String?
-  cantidadOriginal   Int
-  cantidadDisponible Int
+  cantidadOriginal   Float
+  cantidadDisponible Float
   precioUnitario     Float?
   precioPendiente    Boolean  @default(true)
   createdAt          DateTime @default(now())
@@ -225,7 +225,7 @@ model SalidaItem {
   id             String  @id @default(cuid())
   salidaId       String
   loteEntradaId  String
-  cantidad       Int
+  cantidad       Float
   precioUnitario Float?
   costoTotal     Float?
 
@@ -256,7 +256,7 @@ model ApartadoItem {
   apartadoId    String
   articuloId    String
   loteEntradaId String?
-  cantidad      Int
+  cantidad      Float
 
   apartado    Apartado     @relation(fields: [apartadoId], references: [id])
   articulo    Articulo     @relation(fields: [articuloId], references: [id])
@@ -309,7 +309,7 @@ model Movimiento {
   articuloId     String
   nivelOrigenId  String
   nivelDestinoId String
-  cantidadMovida Int
+  cantidadMovida Float
   usuarioId      String
   notas          String?
   createdAt      DateTime @default(now())
