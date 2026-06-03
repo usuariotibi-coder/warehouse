@@ -6,7 +6,7 @@ import { useSession } from 'next-auth/react'
 import {
   LayoutDashboard, Warehouse, ArrowDownToLine, ArrowUpFromLine,
   Bookmark, Package, MapPin, FolderOpen, BarChart3,
-  Users, User, X, PanelLeftClose, PanelLeftOpen,
+  Users, User, X, PanelLeftClose, PanelLeftOpen, HelpCircle,
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -22,6 +22,7 @@ const navItems = [
   { href: '/reportes', label: 'Reportes', icon: BarChart3, roles: ['ADMIN'] },
   { href: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN'] },
   { href: '/perfil', label: 'Mi perfil', icon: User, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/ayuda', label: 'Ayuda', icon: HelpCircle, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
 ]
 
 interface SidebarProps {

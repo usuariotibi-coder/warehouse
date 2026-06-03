@@ -48,5 +48,6 @@ export const config = {
     '/reportes/:path*',
     '/usuarios/:path*',
     '/perfil/:path*',
+    '/ayuda/:path*',
   ],
 }
