@@ -22,6 +22,7 @@ interface KPIs {
   lotesSinPrecio: number
   apartadosProximosVencer: number
   proyectosActivos: number
+  entradasPorProyecto: Array<{ proyecto: string; valor: number; entradas: number }>
 }
 
 const tooltipStyle = {
@@ -111,26 +112,44 @@ export default function DashboardPage() {
         </div>
       )}
 
-      {/* Charts placeholder */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="card-industrial p-5">
-          <h3 className="font-display font-semibold text-sm mb-4 tracking-wide">
-            Movimientos últimos 30 días
-          </h3>
-          <div className="h-48 flex items-center justify-center"
-            style={{ color: 'var(--text-muted)' }}>
-            <p className="text-sm">Conecta la base de datos para ver datos reales</p>
+      {/* Entradas por proyecto */}
+      <div className="card-industrial p-5">
+        <h3 className="font-display font-semibold text-sm mb-4 tracking-wide flex items-center gap-2">
+          <FolderOpen size={16} style={{ color: 'var(--accent-primary)' }} />
+          Valor de entradas por proyecto
+        </h3>
+        {kpis.entradasPorProyecto.length === 0 ? (
+          <p className="text-sm text-center py-6" style={{ color: 'var(--text-muted)' }}>
+            No hay entradas registradas con proyecto
+          </p>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                  {['Proyecto', 'Entradas', 'Valor total (USD)'].map((h) => (
+                    <th key={h} className="px-3 py-2 text-left text-xs uppercase tracking-wider font-medium"
+                      style={{ color: 'var(--text-muted)' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {kpis.entradasPorProyecto.map((row, i) => (
+                  <tr key={i} style={{ borderBottom: '1px solid var(--border)' }}
+                    className="hover:bg-[var(--bg-tertiary)] transition-colors">
+                    <td className="px-3 py-2.5 font-medium text-sm">{row.proyecto}</td>
+                    <td className="px-3 py-2.5 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {row.entradas}
+                    </td>
+                    <td className="px-3 py-2.5 font-mono-data text-sm" style={{ color: 'var(--accent-primary)' }}>
+                      {formatCurrency(row.valor)}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
           </div>
-        </div>
-        <div className="card-industrial p-5">
-          <h3 className="font-display font-semibold text-sm mb-4 tracking-wide">
-            Top artículos del mes
-          </h3>
-          <div className="h-48 flex items-center justify-center"
-            style={{ color: 'var(--text-muted)' }}>
-            <p className="text-sm">Conecta la base de datos para ver datos reales</p>
-          </div>
-        </div>
+        )}
       </div>
     </div>
   )

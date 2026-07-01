@@ -25,6 +25,7 @@ export async function GET() {
     proyectosActivos,
     movimientos30d,
     topArticulos,
+    entradasPorProyecto,
   ] = await Promise.all([
     prisma.loteEntrada.count({ where: { precioPendiente: true, cantidadDisponible: { gt: 0 } } }),
     prisma.loteEntrada.findMany({
@@ -60,6 +61,18 @@ export async function GET() {
       orderBy: { _sum: { cantidad: 'desc' } },
       take: 5,
     }),
+    prisma.$queryRaw<Array<{ proyecto: string; valor: number; entradas: number }>>`
+      SELECT
+        COALESCE(p.nombre, 'Sin proyecto') as proyecto,
+        COALESCE(SUM(le."cantidadOriginal" * le."precioUnitario"), 0)::float as valor,
+        COUNT(DISTINCT e.id)::int as entradas
+      FROM "Entrada" e
+      LEFT JOIN "Proyecto" p ON p.id = e."proyectoId"
+      LEFT JOIN "LoteEntrada" le ON le."entradaId" = e.id AND le."precioPendiente" = false
+      GROUP BY COALESCE(p.nombre, 'Sin proyecto')
+      ORDER BY valor DESC
+      LIMIT 10
+    `,
   ])
 
   const valorInventario = loteConPrecio.reduce(
@@ -76,6 +89,7 @@ export async function GET() {
     proyectosActivos,
     movimientos30d,
     topArticulos,
+    entradasPorProyecto,
   })
 }
 

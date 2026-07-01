@@ -34,6 +34,7 @@ export async function GET(req: Request) {
       orderBy: { fecha: 'desc' },
       include: {
         usuario: { select: { id: true, nombre: true } },
+        proyecto: { select: { id: true, nombre: true } },
         lotes: { include: { articulo: { select: { id: true, nombre: true, unidad: true } } } },
       },
     }),
@@ -52,11 +53,11 @@ export async function POST(req: Request) {
   const parsed = EntradaSchema.safeParse(body)
   if (!parsed.success) return errorResponse(parsed.error.issues[0].message, 'VALIDATION_ERROR')
 
-  const { notas, lotes } = parsed.data
+  const { proyectoId, lotes } = parsed.data
 
   const entrada = await prisma.$transaction(async (tx) => {
     const entrada = await tx.entrada.create({
-      data: { usuarioId: userId!, notas },
+      data: { usuarioId: userId!, proyectoId },
     })
 
     for (const lote of lotes) {

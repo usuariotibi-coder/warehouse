@@ -12,6 +12,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     where: { id: params.id },
     include: {
       usuario: { select: { id: true, nombre: true } },
+      proyecto: { select: { id: true, nombre: true } },
       lotes: {
         include: {
           articulo: true,

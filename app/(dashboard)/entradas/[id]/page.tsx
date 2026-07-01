@@ -14,7 +14,7 @@ import { toast } from 'sonner'
 interface Entrada {
   id: string
   fecha: string
-  notas?: string | null
+  proyecto?: { nombre: string } | null
   usuario: { nombre: string }
   lotes: Array<{
     id: string
@@ -85,6 +85,11 @@ export default function EntradaDetailPage() {
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
               {formatDateTime(entrada.fecha)} · por {entrada.usuario.nombre}
             </p>
+            {entrada.proyecto && (
+              <p className="text-xs mt-1 font-medium" style={{ color: 'var(--accent-primary)' }}>
+                Proyecto: {entrada.proyecto.nombre}
+              </p>
+            )}
           </div>
           {rol === 'ADMIN' && sinPrecio && (
             <Button onClick={() => setShowPrecioModal(true)}>

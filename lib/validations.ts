@@ -32,7 +32,7 @@ export const LoteEntradaSchema = z.object({
 })
 
 export const EntradaSchema = z.object({
-  notas: z.string().optional(),
+  proyectoId: z.string().optional(),
   lotes: z.array(LoteEntradaSchema).min(1, 'Debe haber al menos un artículo'),
 })
 

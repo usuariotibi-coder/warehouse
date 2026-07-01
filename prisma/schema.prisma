@@ -124,6 +124,7 @@ model Proyecto {
   createdAt   DateTime       @default(now())
   updatedAt   DateTime       @updatedAt
 
+  entradas  Entrada[]
   salidas   Salida[]
   apartados Apartado[]
 }
@@ -167,17 +168,19 @@ model ArticuloUbicacion {
 }
 
 model Entrada {
-  id              String    @id @default(cuid())
-  fecha           DateTime  @default(now())
-  usuarioId       String
-  notas           String?
-  createdAt       DateTime  @default(now())
+  id          String    @id @default(cuid())
+  fecha       DateTime  @default(now())
+  usuarioId   String
+  proyectoId  String?
+  createdAt   DateTime  @default(now())
 
-  usuario Usuario       @relation(fields: [usuarioId], references: [id])
-  lotes   LoteEntrada[]
+  usuario  Usuario       @relation(fields: [usuarioId], references: [id])
+  proyecto Proyecto?     @relation(fields: [proyectoId], references: [id])
+  lotes    LoteEntrada[]
 
   @@index([fecha])
   @@index([usuarioId])
+  @@index([proyectoId])
 }
 
 model LoteEntrada {

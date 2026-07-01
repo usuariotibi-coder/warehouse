@@ -14,6 +14,7 @@ interface Entrada {
   id: string
   fecha: string
   usuario: { nombre: string }
+  proyecto?: { nombre: string } | null
   lotes: Array<{
     id: string
     articuloId: string
@@ -64,7 +65,7 @@ export default function EntradasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Fecha', 'Artículos', 'Almacenista', 'Estado', ''].map((h) => (
+                {['Fecha', 'Proyecto', 'Artículos', 'Almacenista', 'Estado', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -83,6 +84,9 @@ export default function EntradasPage() {
                     className="hover:bg-[var(--bg-tertiary)] transition-colors"
                   >
                     <td className="px-4 py-3 font-mono-data text-xs">{formatDate(e.fecha)}</td>
+                    <td className="px-4 py-3 text-xs" style={{ color: e.proyecto ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      {e.proyecto?.nombre ?? '—'}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="space-y-0.5">
                         {e.lotes.slice(0, 2).map((l) => (
