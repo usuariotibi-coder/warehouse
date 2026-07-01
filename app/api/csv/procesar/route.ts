@@ -28,7 +28,7 @@ export async function POST(req: Request) {
     const resultado = await prisma.$transaction(async (tx) => {
       if (tipo === 'entrada') {
         const entrada = await tx.entrada.create({
-          data: { usuarioId: userId!, notas },
+          data: { usuarioId: userId!, proyectoId },
         })
 
         for (const fila of filasValidas) {
@@ -113,7 +113,7 @@ export async function POST(req: Request) {
 
       if (tipo === 'apartado') {
         const fechaExpira = new Date()
-        fechaExpira.setDate(fechaExpira.getDate() + 30)
+        fechaExpira.setDate(fechaExpira.getDate() + 7)
         const apartado = await tx.apartado.create({
           data: { usuarioId: userId!, proyectoId, notas, fechaExpira },
         })

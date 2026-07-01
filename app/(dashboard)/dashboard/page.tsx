@@ -8,10 +8,6 @@ import {
   DollarSign, Package, TrendingDown, Activity,
   AlertCircle, Clock, FolderOpen, ArrowDownToLine,
 } from 'lucide-react'
-import {
-  LineChart, Line, BarChart, Bar, XAxis, YAxis,
-  CartesianGrid, Tooltip, ResponsiveContainer, Legend,
-} from 'recharts'
 import Link from 'next/link'
 
 interface KPIs {
@@ -23,16 +19,6 @@ interface KPIs {
   apartadosProximosVencer: number
   proyectosActivos: number
   entradasPorProyecto: Array<{ proyecto: string; valor: number; entradas: number }>
-}
-
-const tooltipStyle = {
-  contentStyle: {
-    background: 'var(--bg-secondary)',
-    border: '1px solid var(--border-active)',
-    borderRadius: 8,
-    color: 'var(--text-primary)',
-    fontSize: 12,
-  },
 }
 
 export default function DashboardPage() {

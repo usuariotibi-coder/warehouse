@@ -64,6 +64,7 @@ export const UsuarioSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8).optional(),
   rol: z.enum(['ADMIN', 'ALMACENISTA', 'USUARIO']),
+  activo: z.boolean().optional(),
 })
 
 export const PrecioLoteSchema = z.object({

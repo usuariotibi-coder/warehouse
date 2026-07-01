@@ -9,22 +9,33 @@ export async function GET(req: Request) {
   const { error } = await requireAuth()
   if (error) return error
 
+  // Auto-expire any ACTIVO apartados past their expiry date
+  await prisma.apartado.updateMany({
+    where: { estado: 'ACTIVO', fechaExpira: { lt: new Date() } },
+    data: { estado: 'VENCIDO' },
+  })
+
   const { skip, limit } = getPaginationParams(req.url)
   const { searchParams } = new URL(req.url)
   const estado = searchParams.get('estado') ?? 'ACTIVO'
 
+  const where =
+    estado === 'historial'
+      ? { estado: { not: 'ACTIVO' as any } }
+      : { estado: estado as any }
+
   const [apartados, total] = await Promise.all([
     prisma.apartado.findMany({
-      where: { estado: estado as any },
+      where,
       skip, take: limit,
-      orderBy: { fechaExpira: 'asc' },
+      orderBy: { updatedAt: 'desc' },
       include: {
         usuario: { select: { id: true, nombre: true } },
         proyecto: { select: { id: true, nombre: true } },
         items: { include: { articulo: { select: { id: true, nombre: true, unidad: true } } } },
       },
     }),
-    prisma.apartado.count({ where: { estado: estado as any } }),
+    prisma.apartado.count({ where }),
   ])
 
   return successResponse({ apartados, total })

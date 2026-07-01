@@ -9,6 +9,12 @@ export async function GET(req: Request) {
   const { error } = await requireAuth()
   if (error) return error
 
+  // Auto-expire apartados vencidos para que el conteo de reservados sea preciso
+  await prisma.apartado.updateMany({
+    where: { estado: 'ACTIVO', fechaExpira: { lt: new Date() } },
+    data: { estado: 'VENCIDO' },
+  })
+
   const { searchParams } = new URL(req.url)
   const { skip, limit } = getPaginationParams(req.url)
   const q = searchParams.get('q')

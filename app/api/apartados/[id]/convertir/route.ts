@@ -1,7 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/apiHelpers'
 import { errorResponse, successResponse } from '@/lib/utils'
-import { calcularFIFO } from '@/lib/fifo'
+import { calcularFIFO, descontarStockLote } from '@/lib/fifo'
 import { Rol } from '@prisma/client'
 
 export async function POST(_: Request, { params }: { params: { id: string } }) {
@@ -23,6 +23,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
 
   const salida = await prisma.$transaction(async (tx) => {
     let costoTotal = 0
+    let hayLotesSinPrecio = false
 
     const salida = await tx.salida.create({
       data: { usuarioId: userId!, proyectoId: apartado.proyectoId },
@@ -30,6 +31,7 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
 
     for (let i = 0; i < apartado.items.length; i++) {
       const fifo = fifoResults[i]
+      if (fifo.tieneLotesSinPrecio) hayLotesSinPrecio = true
       for (const fi of fifo.items) {
         await tx.salidaItem.create({
           data: {
@@ -40,15 +42,12 @@ export async function POST(_: Request, { params }: { params: { id: string } }) {
             costoTotal: fi.costoTotal,
           },
         })
-        await tx.loteEntrada.update({
-          where: { id: fi.loteEntradaId },
-          data: { cantidadDisponible: { decrement: fi.cantidad } },
-        })
+        await descontarStockLote(tx, fi.loteEntradaId, fi.cantidad)
         if (fi.costoTotal) costoTotal += fi.costoTotal
       }
     }
 
-    await tx.salida.update({ where: { id: salida.id }, data: { costoTotal } })
+    await tx.salida.update({ where: { id: salida.id }, data: { costoTotal: hayLotesSinPrecio ? null : costoTotal } })
 
     await tx.apartado.update({
       where: { id: params.id },

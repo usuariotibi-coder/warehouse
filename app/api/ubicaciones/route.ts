@@ -7,7 +7,7 @@ import { Rol } from '@prisma/client'
 import { z } from 'zod'
 
 const UbicacionCreateSchema = UbicacionSchema.extend({
-  nivelesCount: z.number().int().min(1).max(20).default(1),
+  nivelesCount: z.number().int().min(1).max(20).default(6),
 })
 
 export async function GET() {

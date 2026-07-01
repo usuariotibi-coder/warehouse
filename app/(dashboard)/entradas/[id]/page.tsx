@@ -40,6 +40,7 @@ export default function EntradaDetailPage() {
     fetch(`/api/entradas/${id}`)
       .then((r) => r.json())
       .then((d) => {
+        if (d?.error) { setLoading(false); return }
         setEntrada(d)
         const initPrecios: Record<string, string> = {}
         d.lotes?.forEach((l: any) => { initPrecios[l.id] = l.precioUnitario?.toString() ?? '' })

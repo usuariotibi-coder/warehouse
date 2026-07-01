@@ -278,7 +278,7 @@ export default function ArticulosPage() {
             type="number"
             min={1}
             value={apartadoForm.cantidad}
-            onChange={(e) => setApartadoForm(f => ({ ...f, cantidad: Math.max(1, parseInt(e.target.value) || 1) }))}
+            onChange={(e) => setApartadoForm(f => ({ ...f, cantidad: Math.max(0.001, parseFloat(e.target.value) || 1) }))}
           />
           <div className="rounded-md px-3 py-2.5 text-sm"
             style={{ background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>

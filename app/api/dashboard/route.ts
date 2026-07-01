@@ -3,7 +3,7 @@ import { prisma } from '@/lib/prisma'
 import { requireAuth } from '@/lib/apiHelpers'
 import { errorResponse, successResponse } from '@/lib/utils'
 import { Rol } from '@prisma/client'
-import { startOfMonth, subDays } from 'date-fns'
+import { startOfMonth } from 'date-fns'
 
 export async function GET() {
   const { error, rol } = await requireAuth()
@@ -23,8 +23,6 @@ export async function GET() {
     salidasMes,
     apartadosProximosVencer,
     proyectosActivos,
-    movimientos30d,
-    topArticulos,
     entradasPorProyecto,
   ] = await Promise.all([
     prisma.loteEntrada.count({ where: { precioPendiente: true, cantidadDisponible: { gt: 0 } } }),
@@ -45,22 +43,6 @@ export async function GET() {
       where: { estado: 'ACTIVO', fechaExpira: { lte: en24h } },
     }),
     prisma.proyecto.count({ where: { estado: 'ACTIVO' } }),
-    prisma.$queryRaw`
-      SELECT DATE("fecha") as dia, COUNT(*)::int as total, 'ENTRADA' as tipo
-      FROM "Entrada" WHERE "fecha" >= ${subDays(ahora, 30)}
-      GROUP BY DATE("fecha")
-      UNION ALL
-      SELECT DATE("fecha") as dia, COUNT(*)::int as total, 'SALIDA' as tipo
-      FROM "Salida" WHERE "fecha" >= ${subDays(ahora, 30)}
-      GROUP BY DATE("fecha")
-      ORDER BY dia ASC
-    `,
-    prisma.salidaItem.groupBy({
-      by: ['loteEntradaId'],
-      _sum: { cantidad: true },
-      orderBy: { _sum: { cantidad: 'desc' } },
-      take: 5,
-    }),
     prisma.$queryRaw<Array<{ proyecto: string; valor: number; entradas: number }>>`
       SELECT
         COALESCE(p.nombre, 'Sin proyecto') as proyecto,
@@ -87,8 +69,6 @@ export async function GET() {
     lotesSinPrecio,
     apartadosProximosVencer,
     proyectosActivos,
-    movimientos30d,
-    topArticulos,
     entradasPorProyecto,
   })
 }

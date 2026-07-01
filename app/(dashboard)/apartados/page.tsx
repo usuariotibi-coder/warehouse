@@ -9,7 +9,7 @@ import { SkeletonCard } from '@/components/ui/Skeleton'
 import { formatDate } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
-import { Plus, Trash2, AlertTriangle, Clock, Upload } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle, Clock, Upload, History, CheckCircle2, XCircle, Timer } from 'lucide-react'
 import { CSVUploader } from '@/components/csv/CSVUploader'
 import { addDays, differenceInDays, isPast } from 'date-fns'
 import { motion } from 'framer-motion'
@@ -18,18 +18,29 @@ interface Apartado {
   id: string
   estado: string
   fechaExpira: string
+  updatedAt: string
+  createdAt: string
   notas?: string | null
   usuario: { id: string; nombre: string }
   proyecto?: { nombre: string } | null
   items: Array<{ articulo: { nombre: string; unidad: string }; cantidad: number }>
 }
 
+const estadoBadge: Record<string, { label: string; variant: 'success' | 'danger' | 'default'; icon: React.ReactNode }> = {
+  CONVERTIDO_SALIDA: { label: 'Convertido a salida', variant: 'success', icon: <CheckCircle2 size={11} /> },
+  CANCELADO:         { label: 'Cancelado',            variant: 'default', icon: <XCircle size={11} /> },
+  VENCIDO:           { label: 'Vencido',              variant: 'danger',  icon: <Timer size={11} /> },
+}
+
 export default function ApartadosPage() {
   const { data: session } = useSession()
   const rol = (session?.user as any)?.rol
   const userId = (session?.user as any)?.id
+  const [tab, setTab] = useState<'activos' | 'historial'>('activos')
   const [apartados, setApartados] = useState<Apartado[]>([])
+  const [historial, setHistorial] = useState<Apartado[]>([])
   const [loading, setLoading] = useState(true)
+  const [loadingHist, setLoadingHist] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [csvOpen, setCsvOpen] = useState(false)
   const [articulos, setArticulos] = useState<any[]>([])
@@ -40,12 +51,22 @@ export default function ApartadosPage() {
   const [saving, setSaving] = useState(false)
 
   const fetchApartados = useCallback(async () => {
-    const res = await fetch('/api/apartados')
+    const res = await fetch('/api/apartados?estado=ACTIVO')
     if (res.ok) {
       const data = await res.json()
       setApartados(data.apartados)
     }
     setLoading(false)
+  }, [])
+
+  const fetchHistorial = useCallback(async () => {
+    setLoadingHist(true)
+    const res = await fetch('/api/apartados?estado=historial&limit=50')
+    if (res.ok) {
+      const data = await res.json()
+      setHistorial(data.apartados)
+    }
+    setLoadingHist(false)
   }, [])
 
   useEffect(() => {
@@ -58,6 +79,10 @@ export default function ApartadosPage() {
       setProyectos(p.filter((pr: any) => pr.estado === 'ACTIVO'))
     })
   }, [fetchApartados])
+
+  useEffect(() => {
+    if (tab === 'historial' && historial.length === 0) fetchHistorial()
+  }, [tab, historial.length, fetchHistorial])
 
   async function crearApartado() {
     if (formItems.some((i) => !i.articuloId || i.cantidad < 1)) {
@@ -74,6 +99,8 @@ export default function ApartadosPage() {
       toast.success('Apartado creado')
       setShowForm(false)
       setFormItems([{ articuloId: '', cantidad: 1 }])
+      setProyectoId('')
+      setNotas('')
       fetchApartados()
     } else {
       const err = await res.json()
@@ -87,6 +114,7 @@ export default function ApartadosPage() {
     if (res.ok) {
       toast.success('Apartado cancelado')
       fetchApartados()
+      if (tab === 'historial') fetchHistorial()
     }
   }
 
@@ -95,6 +123,7 @@ export default function ApartadosPage() {
     if (res.ok) {
       toast.success('Apartado convertido a salida')
       fetchApartados()
+      if (tab === 'historial') fetchHistorial()
     } else {
       const err = await res.json()
       toast.error(err.message)
@@ -112,72 +141,176 @@ export default function ApartadosPage() {
 
   return (
     <div className="space-y-5">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold">Apartados activos</h2>
-        <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
-            <Upload size={14} /> Cargar CSV
-          </Button>
-          <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> Nuevo apartado</Button>
+        <div className="flex items-center gap-1 p-1 rounded-lg" style={{ background: 'var(--bg-secondary)' }}>
+          <button
+            onClick={() => setTab('activos')}
+            className="px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={{
+              background: tab === 'activos' ? 'var(--accent-primary)' : 'transparent',
+              color: tab === 'activos' ? '#fff' : 'var(--text-secondary)',
+            }}
+          >
+            Activos {apartados.length > 0 && `(${apartados.length})`}
+          </button>
+          <button
+            onClick={() => setTab('historial')}
+            className="flex items-center gap-1.5 px-4 py-1.5 rounded-md text-sm font-medium transition-colors"
+            style={{
+              background: tab === 'historial' ? 'var(--bg-tertiary)' : 'transparent',
+              color: tab === 'historial' ? 'var(--text-primary)' : 'var(--text-secondary)',
+            }}
+          >
+            <History size={13} /> Historial
+          </button>
         </div>
+        {tab === 'activos' && (
+          <div className="flex gap-2">
+            <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
+              <Upload size={14} /> Cargar CSV
+            </Button>
+            <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> Nuevo apartado</Button>
+          </div>
+        )}
         {csvOpen && (
           <CSVUploader tipo="apartado" onProcesado={fetchApartados} onClose={() => setCsvOpen(false)} />
         )}
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {apartados.map((a, i) => {
-          const vc = vencimientoLabel(a.fechaExpira)
-          const canEdit = rol === 'ADMIN' || a.usuario.id === userId
-          return (
-            <motion.div key={a.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.05 }} className="card-industrial p-4">
-              <div className="flex items-start justify-between mb-3">
-                <div>
-                  <p className="text-sm font-medium">{a.usuario.nombre}</p>
-                  {a.proyecto && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{a.proyecto.nombre}</p>}
-                </div>
-                <div className="flex items-center gap-1.5">
-                  <Clock size={12} style={{ color: vc.color }} />
-                  <span className="text-xs" style={{ color: vc.color }}>{vc.text}</span>
-                </div>
-              </div>
-
-              <div className="space-y-1 mb-3">
-                {a.items.map((item, j) => (
-                  <div key={j} className="flex justify-between text-xs p-2 rounded"
-                    style={{ background: 'var(--bg-tertiary)' }}>
-                    <span>{item.articulo.nombre}</span>
-                    <span className="font-mono-data" style={{ color: 'var(--accent-purple)' }}>
-                      {item.cantidad} {item.articulo.unidad}
-                    </span>
+      {/* ACTIVOS */}
+      {tab === 'activos' && (
+        <>
+          <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+            {apartados.map((a, i) => {
+              const vc = vencimientoLabel(a.fechaExpira)
+              const canEdit = rol === 'ADMIN' || a.usuario.id === userId
+              return (
+                <motion.div key={a.id} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: i * 0.05 }} className="card-industrial p-4">
+                  <div className="flex items-start justify-between mb-3">
+                    <div>
+                      <p className="text-sm font-medium">{a.usuario.nombre}</p>
+                      {a.proyecto && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{a.proyecto.nombre}</p>}
+                      <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
+                        Creado {formatDate(a.createdAt)}
+                      </p>
+                    </div>
+                    <div className="flex items-center gap-1.5">
+                      <Clock size={12} style={{ color: vc.color }} />
+                      <span className="text-xs" style={{ color: vc.color }}>{vc.text}</span>
+                    </div>
                   </div>
-                ))}
-              </div>
 
-              {canEdit && (
-                <div className="flex gap-2">
-                  {rol !== 'USUARIO' && (
-                    <Button variant="secondary" size="sm" onClick={() => convertirASalida(a.id)}>
-                      Convertir a salida
-                    </Button>
+                  <div className="space-y-1 mb-3">
+                    {a.items.map((item, j) => (
+                      <div key={j} className="flex justify-between text-xs p-2 rounded"
+                        style={{ background: 'var(--bg-tertiary)' }}>
+                        <span>{item.articulo.nombre}</span>
+                        <span className="font-mono-data" style={{ color: 'var(--accent-purple)' }}>
+                          {item.cantidad} {item.articulo.unidad}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+
+                  {canEdit && (
+                    <div className="flex gap-2">
+                      {rol !== 'USUARIO' && (
+                        <Button variant="secondary" size="sm" onClick={() => convertirASalida(a.id)}>
+                          Convertir a salida
+                        </Button>
+                      )}
+                      <Button variant="danger" size="sm" onClick={() => cancelarApartado(a.id)}>
+                        Cancelar
+                      </Button>
+                    </div>
                   )}
-                  <Button variant="danger" size="sm" onClick={() => cancelarApartado(a.id)}>
-                    Cancelar
-                  </Button>
-                </div>
-              )}
-            </motion.div>
-          )
-        })}
-      </div>
-
-      {apartados.length === 0 && (
-        <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
-          No hay apartados activos
-        </p>
+                </motion.div>
+              )
+            })}
+          </div>
+          {apartados.length === 0 && (
+            <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
+              No hay apartados activos
+            </p>
+          )}
+        </>
       )}
 
+      {/* HISTORIAL */}
+      {tab === 'historial' && (
+        <>
+          {loadingHist ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+              {Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}
+            </div>
+          ) : historial.length === 0 ? (
+            <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
+              Sin registros en el historial
+            </p>
+          ) : (
+            <div className="card-industrial overflow-hidden">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr style={{ borderBottom: '1px solid var(--border)' }}>
+                    {['Usuario', 'Proyecto', 'Artículos', 'Creado', 'Expiración', 'Resultado'].map((h) => (
+                      <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
+                        style={{ color: 'var(--text-muted)' }}>{h}</th>
+                    ))}
+                  </tr>
+                </thead>
+                <tbody>
+                  {historial.map((a, i) => {
+                    const info = estadoBadge[a.estado]
+                    return (
+                      <motion.tr key={a.id}
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
+                        style={{ borderBottom: '1px solid var(--border)' }}
+                        className="hover:bg-[var(--bg-tertiary)] transition-colors"
+                      >
+                        <td className="px-4 py-3 text-sm font-medium">{a.usuario.nombre}</td>
+                        <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          {a.proyecto?.nombre ?? '—'}
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="space-y-0.5">
+                            {a.items.slice(0, 2).map((item, j) => (
+                              <p key={j} className="text-xs truncate max-w-48">
+                                {item.cantidad}× {item.articulo.nombre}
+                              </p>
+                            ))}
+                            {a.items.length > 2 && (
+                              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{a.items.length - 2} más</p>
+                            )}
+                          </div>
+                        </td>
+                        <td className="px-4 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
+                          {formatDate(a.createdAt)}
+                        </td>
+                        <td className="px-4 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
+                          {formatDate(a.fechaExpira)}
+                        </td>
+                        <td className="px-4 py-3">
+                          {info && (
+                            <span className="flex items-center gap-1">
+                              <Badge variant={info.variant}>
+                                <span className="flex items-center gap-1">{info.icon} {info.label}</span>
+                              </Badge>
+                            </span>
+                          )}
+                        </td>
+                      </motion.tr>
+                    )
+                  })}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </>
+      )}
+
+      {/* Modal Nuevo apartado */}
       <Modal open={showForm} onClose={() => setShowForm(false)} title="Nuevo apartado" size="lg">
         <div className="space-y-4">
           {/* Aviso de vencimiento */}
@@ -190,23 +323,26 @@ export default function ApartadosPage() {
                 </p>
                 <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
                   Los artículos apartados quedan reservados por <strong>7 días calendario</strong> a partir de hoy
-                  ({formatDate(addDays(new Date(), 7))}). Después de esa fecha, los artículos quedarán disponibles
-                  automáticamente para otros usuarios. Asegúrate de procesar la salida antes del vencimiento.
+                  ({formatDate(addDays(new Date(), 7))}). Después de esa fecha, el apartado se marcará como vencido
+                  y los artículos quedarán disponibles automáticamente.
                 </p>
               </div>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>
-              Proyecto (opcional)
-            </label>
-            <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
-              style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
-              <option value="">Sin proyecto</option>
-              {proyectos.map((p: any) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
-            </select>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>
+                Proyecto (opcional)
+              </label>
+              <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)}
+                className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
+                style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
+                <option value="">Sin proyecto</option>
+                {proyectos.map((p: any) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
+              </select>
+            </div>
+            <Input label="Notas (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
           </div>
 
           <div className="space-y-2">
@@ -216,29 +352,42 @@ export default function ApartadosPage() {
                 <Plus size={12} /> Agregar
               </Button>
             </div>
+            {/* Header */}
+            <div className="hidden sm:grid grid-cols-12 gap-3 px-1 pb-0.5">
+              <div className="col-span-9 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Artículo</div>
+              <div className="col-span-2 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Cantidad</div>
+            </div>
             {formItems.map((item, i) => (
-              <div key={i} className="flex gap-3 items-center">
-                <select value={item.articuloId}
-                  onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, articuloId: e.target.value } : fi))}
-                  className="flex-1 px-3 py-2.5 rounded-md text-sm outline-none border"
-                  style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
-                  <option value="">Seleccionar artículo...</option>
-                  {articulos.map((a: any) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
-                </select>
-                <input type="number" min={1} value={item.cantidad}
-                  onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, cantidad: parseInt(e.target.value) || 1 } : fi))}
-                  className="w-20 px-3 py-2.5 rounded-md text-sm outline-none border font-mono-data"
-                  style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
-                {formItems.length > 1 && (
-                  <button onClick={() => setFormItems((f) => f.filter((_, idx) => idx !== i))}>
-                    <Trash2 size={14} style={{ color: 'var(--accent-danger)' }} />
-                  </button>
-                )}
+              <div key={i} className="grid grid-cols-12 gap-3 items-center p-2 rounded-lg"
+                style={{ background: 'var(--bg-tertiary)' }}>
+                <div className="col-span-12 sm:col-span-9">
+                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Artículo</label>
+                  <select value={item.articuloId}
+                    onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, articuloId: e.target.value } : fi))}
+                    className="w-full px-3 py-2 rounded-md text-sm outline-none border"
+                    style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
+                    <option value="">Seleccionar artículo...</option>
+                    {articulos.map((a: any) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
+                  </select>
+                </div>
+                <div className="col-span-10 sm:col-span-2">
+                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Cantidad</label>
+                  <input type="number" min={0.001} step="any" value={item.cantidad}
+                    onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, cantidad: parseFloat(e.target.value) || 1 } : fi))}
+                    className="w-full px-3 py-2 rounded-md text-sm outline-none border text-center font-mono-data"
+                    style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }} />
+                </div>
+                <div className="col-span-2 sm:col-span-1 flex justify-center">
+                  {formItems.length > 1 && (
+                    <button onClick={() => setFormItems((f) => f.filter((_, idx) => idx !== i))}
+                      className="p-1.5 rounded hover:bg-red-500/20 transition-colors">
+                      <Trash2 size={14} style={{ color: 'var(--accent-danger)' }} />
+                    </button>
+                  )}
+                </div>
               </div>
             ))}
           </div>
-
-          <Input label="Notas (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
 
           <div className="flex gap-3 justify-end pt-2">
             <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>

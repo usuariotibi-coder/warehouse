@@ -103,9 +103,9 @@ export async function validarCSV(
       }
     }
 
-    const cantidad = parseInt(cantidadStr)
+    const cantidad = parseFloat(cantidadStr)
     if (!cantidadStr || isNaN(cantidad) || cantidad <= 0) {
-      errors.push('cantidad debe ser un número entero positivo')
+      errors.push('cantidad debe ser un número positivo')
     } else {
       resolvedData.cantidad = cantidad
     }
