@@ -85,13 +85,13 @@ export async function GET() {
       where: { precioUnitario: 0, cantidadDisponible: { gt: 0 } },
       _sum: { cantidadDisponible: true },
     }),
-    prisma.$queryRaw`
+    prisma.$queryRaw<Array<{ valor: number }>>`
       SELECT COALESCE(SUM(le."cantidadOriginal" * le."precioUnitario"), 0)::float as valor
       FROM "Entrada" e
       LEFT JOIN "LoteEntrada" le ON le."entradaId" = e.id AND le."precioPendiente" = false
       WHERE e.fecha >= ${inicioMes}
     `,
-    prisma.$queryRaw`
+    prisma.$queryRaw<Array<{ valor: number }>>`
       SELECT COALESCE(SUM(si."costoTotal"), 0)::float as valor
       FROM "Salida" s
       LEFT JOIN "SalidaItem" si ON si."salidaId" = s.id
