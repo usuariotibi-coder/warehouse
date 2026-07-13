@@ -5,10 +5,11 @@ import { Button } from '@/components/ui/Button'
 import { Badge } from '@/components/ui/Badge'
 import { SkeletonTable } from '@/components/ui/Skeleton'
 import { CSVUploader } from '@/components/csv/CSVUploader'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatCurrency } from '@/lib/utils'
 import { Plus, AlertCircle, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
+import { useRouter } from 'next/navigation'
 
 interface Entrada {
   id: string
@@ -20,11 +21,13 @@ interface Entrada {
     articuloId: string
     cantidadOriginal: number
     precioPendiente: boolean
+    precioUnitario?: number | null
     articulo: { nombre: string }
   }>
 }
 
 export default function EntradasPage() {
+  const router = useRouter()
   const [entradas, setEntradas] = useState<Entrada[]>([])
   const [loading, setLoading] = useState(true)
   const [csvOpen, setCsvOpen] = useState(false)
@@ -65,8 +68,8 @@ export default function EntradasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Date', 'Project', 'Items', 'Operator', 'Status', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
+                {['Date', 'Project', 'Total Items', 'Total Pieces', 'USD Value', 'Without Price', 'Status'].map((h) => (
+                  <th key={h} className="px-3 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
               </tr>
@@ -74,6 +77,13 @@ export default function EntradasPage() {
             <tbody>
               {entradas.map((e, i) => {
                 const sinPrecio = e.lotes.some((l) => l.precioPendiente)
+                const cantidadSinPrecio = e.lotes.filter((l) => l.precioPendiente).length
+                const totalItems = e.lotes.length
+                const totalPiezas = e.lotes.reduce((sum, l) => sum + l.cantidadOriginal, 0)
+                const valorUSD = e.lotes
+                  .filter((l) => !l.precioPendiente && l.precioUnitario)
+                  .reduce((sum, l) => sum + (l.cantidadOriginal * (l.precioUnitario ?? 0)), 0)
+
                 return (
                   <motion.tr
                     key={e.id}
@@ -81,28 +91,30 @@ export default function EntradasPage() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: i * 0.03 }}
                     style={{ borderBottom: '1px solid var(--border)' }}
-                    className="hover:bg-[var(--bg-tertiary)] transition-colors"
+                    className="hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
+                    onClick={() => router.push(`/entradas/${e.id}`)}
                   >
-                    <td className="px-4 py-3 font-mono-data text-xs">{formatDate(e.fecha)}</td>
-                    <td className="px-4 py-3 text-xs" style={{ color: e.proyecto ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                    <td className="px-3 py-3 font-mono-data text-xs">{formatDate(e.fecha)}</td>
+                    <td className="px-3 py-3 text-xs" style={{ color: e.proyecto ? 'var(--text-primary)' : 'var(--text-muted)' }}>
                       {e.proyecto?.nombre ?? '—'}
                     </td>
-                    <td className="px-4 py-3">
-                      <div className="space-y-0.5">
-                        {e.lotes.slice(0, 2).map((l) => (
-                          <p key={l.id} className="text-xs truncate max-w-40">
-                            {l.cantidadOriginal}× {l.articulo.nombre}
-                          </p>
-                        ))}
-                        {e.lotes.length > 2 && (
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{e.lotes.length - 2} more</p>
-                        )}
-                      </div>
+                    <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {totalItems}
                     </td>
-                    <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
-                      {e.usuario.nombre}
+                    <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {totalPiezas.toLocaleString()}
                     </td>
-                    <td className="px-4 py-3">
+                    <td className="px-3 py-3 font-mono-data font-bold" style={{ color: 'var(--accent-primary)' }}>
+                      {formatCurrency(valorUSD)}
+                    </td>
+                    <td className="px-3 py-3 font-mono-data text-xs" style={{ color: cantidadSinPrecio > 0 ? 'var(--accent-warning)' : 'var(--text-secondary)' }}>
+                      {cantidadSinPrecio > 0 ? (
+                        <span>{cantidadSinPrecio}</span>
+                      ) : (
+                        <span style={{ color: 'var(--text-muted)' }}>—</span>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
                       {sinPrecio ? (
                         <Badge variant="warning">
                           <AlertCircle size={10} className="mr-1" />No price
@@ -110,11 +122,6 @@ export default function EntradasPage() {
                       ) : (
                         <Badge variant="success">Priced</Badge>
                       )}
-                    </td>
-                    <td className="px-4 py-3">
-                      <Link href={`/entradas/${e.id}`}>
-                        <Button variant="ghost" size="sm">View</Button>
-                      </Link>
                     </td>
                   </motion.tr>
                 )

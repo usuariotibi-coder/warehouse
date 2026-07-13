@@ -84,40 +84,49 @@ export default function SalidasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Date', 'Items', 'Project', 'FIFO Cost', 'Operator', ''].map((h) => (
-                  <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
+                {['Date', 'Project', 'Total Items', 'Total Pieces', 'USD Value', 'Status'].map((h) => (
+                  <th key={h} className="px-3 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {salidas.map((s, i) => (
-                <motion.tr
-                  key={s.id}
-                  initial={{ opacity: 0 }}
-                  animate={{ opacity: 1 }}
-                  transition={{ delay: i * 0.03 }}
-                  style={{ borderBottom: '1px solid var(--border)' }}
-                  className="hover:bg-[var(--bg-tertiary)] transition-colors"
-                >
-                  <td className="px-4 py-3 font-mono-data text-xs">{formatDate(s.fecha)}</td>
-                  <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                    {s.items.slice(0, 2).map((it, j) => (
-                      <span key={j} className="block">{it.cantidad}× {it.loteEntrada.articulo.nombre}</span>
-                    ))}
-                    {s.items.length > 2 && <span style={{ color: 'var(--text-muted)' }}>+{s.items.length - 2} more</span>}
-                  </td>
-                  <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>
-                    {s.proyecto?.nombre ?? '—'}
-                  </td>
-                  <td className="px-4 py-3 font-mono-data font-bold" style={{ color: 'var(--accent-primary)' }}>
-                    {s.costoTotal != null ? formatCurrency(s.costoTotal) : (
-                      <Badge variant="warning">Pending</Badge>
-                    )}
-                  </td>
-                  <td className="px-4 py-3" style={{ color: 'var(--text-secondary)' }}>{s.usuario.nombre}</td>
-                  <td className="px-4 py-3">
-                    <Button variant="ghost" size="sm" onClick={() => abrirDetalle(s.id)}>View</Button>
+              {salidas.map((s, i) => {
+                const totalItems = s.items.length
+                const totalPiezas = s.items.reduce((sum, it) => sum + it.cantidad, 0)
+                const costoPendiente = s.costoTotal == null
+
+                return (
+                  <motion.tr
+                    key={s.id}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: i * 0.03 }}
+                    style={{ borderBottom: '1px solid var(--border)' }}
+                    className="hover:bg-[var(--bg-tertiary)] transition-colors cursor-pointer"
+                    onClick={() => abrirDetalle(s.id)}
+                  >
+                    <td className="px-3 py-3 font-mono-data text-xs">{formatDate(s.fecha)}</td>
+                    <td className="px-3 py-3 text-xs" style={{ color: s.proyecto ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                      {s.proyecto?.nombre ?? '—'}
+                    </td>
+                    <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {totalItems}
+                    </td>
+                    <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                      {totalPiezas.toLocaleString()}
+                    </td>
+                    <td className="px-3 py-3 font-mono-data font-bold" style={{ color: 'var(--accent-primary)' }}>
+                      {s.costoTotal != null ? formatCurrency(s.costoTotal) : (
+                        <Badge variant="warning">Pending</Badge>
+                      )}
+                    </td>
+                    <td className="px-3 py-3">
+                      {costoPendiente ? (
+                        <Badge variant="warning">Pending</Badge>
+                      ) : (
+                        <Badge variant="success">Complete</Badge>
+                      )}
                   </td>
                 </motion.tr>
               ))}

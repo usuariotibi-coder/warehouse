@@ -254,8 +254,8 @@ export default function ApartadosPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['User', 'Project', 'Items', 'Created', 'Expiration', 'Result'].map((h) => (
-                      <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
+                    {['Created', 'Project', 'Total Items', 'Total Pieces', 'User', 'Result'].map((h) => (
+                      <th key={h} className="px-3 py-3 text-left text-xs uppercase tracking-wider font-medium"
                         style={{ color: 'var(--text-muted)' }}>{h}</th>
                     ))}
                   </tr>
@@ -263,41 +263,35 @@ export default function ApartadosPage() {
                 <tbody>
                   {historial.map((a, i) => {
                     const info = estadoBadge[a.estado]
+                    const totalItems = a.items.length
+                    const totalPiezas = a.items.reduce((sum, it) => sum + it.cantidad, 0)
+
                     return (
                       <motion.tr key={a.id}
                         initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: i * 0.02 }}
                         style={{ borderBottom: '1px solid var(--border)' }}
                         className="hover:bg-[var(--bg-tertiary)] transition-colors"
                       >
-                        <td className="px-4 py-3 text-sm font-medium">{a.usuario.nombre}</td>
-                        <td className="px-4 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
-                          {a.proyecto?.nombre ?? '—'}
-                        </td>
-                        <td className="px-4 py-3">
-                          <div className="space-y-0.5">
-                            {a.items.slice(0, 2).map((item, j) => (
-                              <p key={j} className="text-xs truncate max-w-48">
-                                {item.cantidad}× {item.articulo.nombre}
-                              </p>
-                            ))}
-                            {a.items.length > 2 && (
-                              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{a.items.length - 2} more</p>
-                            )}
-                          </div>
-                        </td>
-                        <td className="px-4 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
+                        <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
                           {formatDate(a.createdAt)}
                         </td>
-                        <td className="px-4 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
-                          {formatDate(a.fechaExpira)}
+                        <td className="px-3 py-3 text-xs" style={{ color: a.proyecto ? 'var(--text-primary)' : 'var(--text-muted)' }}>
+                          {a.proyecto?.nombre ?? '—'}
                         </td>
-                        <td className="px-4 py-3">
+                        <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          {totalItems}
+                        </td>
+                        <td className="px-3 py-3 font-mono-data text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          {totalPiezas.toLocaleString()}
+                        </td>
+                        <td className="px-3 py-3 text-xs" style={{ color: 'var(--text-secondary)' }}>
+                          {a.usuario.nombre}
+                        </td>
+                        <td className="px-3 py-3">
                           {info && (
-                            <span className="flex items-center gap-1">
-                              <Badge variant={info.variant}>
-                                <span className="flex items-center gap-1">{info.icon} {info.label}</span>
-                              </Badge>
-                            </span>
+                            <Badge variant={info.variant}>
+                              <span className="flex items-center gap-1">{info.icon} {info.label}</span>
+                            </Badge>
                           )}
                         </td>
                       </motion.tr>
