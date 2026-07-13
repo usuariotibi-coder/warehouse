@@ -6,16 +6,20 @@ import { SkeletonCard } from '@/components/ui/Skeleton'
 import { formatCurrency } from '@/lib/utils'
 import {
   DollarSign, Package, TrendingDown, Activity,
-  AlertCircle, Clock, FolderOpen, ArrowDownToLine,
+  AlertCircle, Clock, FolderOpen, ArrowDownToLine, ArrowUpFromLine,
 } from 'lucide-react'
 import Link from 'next/link'
 
 interface KPIs {
   valorInventario: number
   articulosEnStock: number
-  articulosEnCero: number
   movimientosMes: number
   lotesSinPrecio: number
+  piezasEnStock: number
+  piezasSinPrecio: number
+  piezasConPrecioCero: number
+  entradasMesValor: number
+  salidasMesValor: number
   apartadosProximosVencer: number
   proyectosActivos: number
   resumenPorProyecto: Array<{ proyecto: string; entradas: number; valorEntradas: number; salidas: number; valorSalidas: number }>
@@ -46,22 +50,40 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       {/* KPIs */}
-      <div className="grid grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
         <KPICard title="Inventory Value" value={formatCurrency(kpis.valorInventario)}
           icon={DollarSign} color="cyan" index={0} />
         <KPICard title="Items in Stock" value={kpis.articulosEnStock}
           icon={Package} color="green" index={1} />
-        <KPICard title="Out of Stock" value={kpis.articulosEnCero}
-          icon={TrendingDown} color="danger" index={2} />
-        <KPICard title="Monthly Movements" value={kpis.movimientosMes}
-          icon={Activity} color="cyan" index={3} />
+        <KPICard title="Pieces in Stock" value={kpis.piezasEnStock.toLocaleString()}
+          icon={Package} color="green" index={2} />
+        <KPICard title="Entries (Current Month)" value={formatCurrency(kpis.entradasMesValor)}
+          icon={ArrowDownToLine} color="cyan" index={3} />
+        <KPICard title="Exits (Current Month)" value={formatCurrency(kpis.salidasMesValor)}
+          icon={ArrowUpFromLine} color="cyan" index={4} />
         <KPICard
           title="Lots Without Price"
           value={kpis.lotesSinPrecio}
           icon={AlertCircle}
           color={kpis.lotesSinPrecio > 0 ? 'warning' : 'green'}
           subtitle={kpis.lotesSinPrecio > 0 ? 'Need assignment' : 'All priced'}
-          index={4}
+          index={5}
+        />
+        <KPICard
+          title="Pieces Without Price"
+          value={kpis.piezasSinPrecio.toLocaleString()}
+          icon={AlertCircle}
+          color={kpis.piezasSinPrecio > 0 ? 'warning' : 'green'}
+          subtitle={kpis.piezasSinPrecio > 0 ? 'Need assignment' : 'All priced'}
+          index={6}
+        />
+        <KPICard
+          title="Pieces $0 Price"
+          value={kpis.piezasConPrecioCero.toLocaleString()}
+          icon={AlertCircle}
+          color={kpis.piezasConPrecioCero > 0 ? 'warning' : 'green'}
+          subtitle={kpis.piezasConPrecioCero > 0 ? 'Zero cost' : 'None'}
+          index={7}
         />
         <KPICard
           title="Reserves Expiring"
@@ -69,10 +91,10 @@ export default function DashboardPage() {
           icon={Clock}
           color={kpis.apartadosProximosVencer > 0 ? 'warning' : 'green'}
           subtitle="Next 24h"
-          index={5}
+          index={8}
         />
         <KPICard title="Active Projects" value={kpis.proyectosActivos}
-          icon={FolderOpen} color="purple" index={6} />
+          icon={FolderOpen} color="purple" index={9} />
       </div>
 
       {/* Alert for lots without price */}

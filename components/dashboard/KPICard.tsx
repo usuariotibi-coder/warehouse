@@ -28,20 +28,20 @@ export function KPICard({ title, value, subtitle, icon: Icon, color = 'cyan', in
       initial={{ opacity: 0, y: 16 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.1 }}
-      className="card-industrial p-5"
+      className="card-industrial p-3"
     >
-      <div className="flex items-start justify-between mb-3">
-        <p className="text-xs uppercase tracking-widest font-medium"
+      <div className="flex items-start justify-between mb-2">
+        <p className="text-xs uppercase tracking-widest font-medium leading-tight"
           style={{ color: 'var(--text-muted)' }}>
           {title}
         </p>
-        <div className="p-2 rounded-lg" style={{ background: `${c}18` }}>
-          <Icon size={16} style={{ color: c }} />
+        <div className="p-1.5 rounded-lg flex-shrink-0" style={{ background: `${c}18` }}>
+          <Icon size={14} style={{ color: c }} />
         </div>
       </div>
-      <p className="font-mono-data text-2xl font-bold" style={{ color: c }}>{value}</p>
+      <p className="font-mono-data text-xl font-bold leading-tight" style={{ color: c }}>{value}</p>
       {subtitle && (
-        <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
+        <p className="text-xs mt-0.5 leading-tight" style={{ color: 'var(--text-muted)' }}>{subtitle}</p>
       )}
     </motion.div>
   )

@@ -19,12 +19,17 @@ export async function GET() {
     loteConPrecio,
     articulosTotal,
     articulosEnCero,
-    entradasMes,
-    salidasMes,
+    entradasMesCount,
+    salidasMesCount,
     apartadosProximosVencer,
     proyectosActivos,
     entradasPorProyecto,
     salidasPorProyecto,
+    piezasEnStock,
+    piezasSinPrecio,
+    piezasConPrecioCero,
+    entradasMesValor,
+    salidasMesValor,
   ] = await Promise.all([
     prisma.loteEntrada.count({ where: { precioPendiente: true, cantidadDisponible: { gt: 0 } } }),
     prisma.loteEntrada.findMany({
@@ -68,6 +73,30 @@ export async function GET() {
       ORDER BY valor DESC
       LIMIT 10
     `,
+    prisma.loteEntrada.aggregate({
+      where: { cantidadDisponible: { gt: 0 } },
+      _sum: { cantidadDisponible: true },
+    }),
+    prisma.loteEntrada.aggregate({
+      where: { precioPendiente: true, cantidadDisponible: { gt: 0 } },
+      _sum: { cantidadDisponible: true },
+    }),
+    prisma.loteEntrada.aggregate({
+      where: { precioUnitario: 0, cantidadDisponible: { gt: 0 } },
+      _sum: { cantidadDisponible: true },
+    }),
+    prisma.$queryRaw`
+      SELECT COALESCE(SUM(le."cantidadOriginal" * le."precioUnitario"), 0)::float as valor
+      FROM "Entrada" e
+      LEFT JOIN "LoteEntrada" le ON le."entradaId" = e.id AND le."precioPendiente" = false
+      WHERE e.fecha >= ${inicioMes}
+    `,
+    prisma.$queryRaw`
+      SELECT COALESCE(SUM(si."costoTotal"), 0)::float as valor
+      FROM "Salida" s
+      LEFT JOIN "SalidaItem" si ON si."salidaId" = s.id
+      WHERE s.fecha >= ${inicioMes}
+    `,
   ])
 
   const valorInventario = loteConPrecio.reduce(
@@ -98,12 +127,19 @@ export async function GET() {
 
   const resumenPorProyecto = Array.from(proyectoMap.values()).sort((a, b) => b.valorSalidas - a.valorSalidas)
 
+  const entradasMesValorFinal = (entradasMesValor[0] as any)?.valor ?? 0
+  const salidasMesValorFinal = (salidasMesValor[0] as any)?.valor ?? 0
+
   return successResponse({
     valorInventario,
     articulosEnStock: articulosTotal - articulosEnCero,
-    articulosEnCero,
-    movimientosMes: entradasMes + salidasMes,
+    movimientosMes: entradasMesCount + salidasMesCount,
     lotesSinPrecio,
+    piezasEnStock: piezasEnStock._sum.cantidadDisponible ?? 0,
+    piezasSinPrecio: piezasSinPrecio._sum.cantidadDisponible ?? 0,
+    piezasConPrecioCero: piezasConPrecioCero._sum.cantidadDisponible ?? 0,
+    entradasMesValor: entradasMesValorFinal,
+    salidasMesValor: salidasMesValorFinal,
     apartadosProximosVencer,
     proyectosActivos,
     resumenPorProyecto,
