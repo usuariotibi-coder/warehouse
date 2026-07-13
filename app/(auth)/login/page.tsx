@@ -10,8 +10,8 @@ import { toast } from 'sonner'
 import { ThemeToggle } from '@/components/theme/ThemeToggle'
 
 const LoginSchema = z.object({
-  email: z.string().email('Email inválido'),
-  password: z.string().min(1, 'La contraseña es requerida'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(1, 'Password is required'),
 })
 type LoginForm = z.infer<typeof LoginSchema>
 
@@ -32,7 +32,7 @@ export default function LoginPage() {
     })
 
     if (result?.error) {
-      toast.error('Credenciales incorrectas')
+      toast.error('Invalid credentials')
       setLoading(false)
       return
     }
@@ -63,10 +63,10 @@ export default function LoginPage() {
               className="font-display text-3xl font-bold tracking-widest"
               style={{ color: 'var(--accent-primary)' }}
             >
-              INVENTAPRO
+              MXQ-STOCK
             </h1>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              Sistema de Control de Inventario
+              Inventory Control System
             </p>
           </div>
 
@@ -88,7 +88,7 @@ export default function LoginPage() {
                   border: `1px solid ${errors.email ? 'var(--accent-danger)' : 'var(--border)'}`,
                   color: 'var(--text-primary)',
                 }}
-                placeholder="admin@inventapro.com"
+                placeholder="admin@mxqstock.com"
               />
               {errors.email && (
                 <p className="text-xs mt-1" style={{ color: 'var(--accent-danger)' }}>
@@ -102,7 +102,7 @@ export default function LoginPage() {
                 className="block text-xs font-medium mb-1.5 tracking-wider uppercase"
                 style={{ color: 'var(--text-secondary)' }}
               >
-                Contraseña
+                Password
               </label>
               <input
                 {...register('password')}
@@ -132,12 +132,12 @@ export default function LoginPage() {
                 color: 'var(--text-on-accent)',
               }}
             >
-              {loading ? 'Iniciando sesión...' : 'Iniciar sesión'}
+              {loading ? 'Signing in...' : 'Sign In'}
             </button>
           </form>
 
           <p className="text-center text-xs mt-6" style={{ color: 'var(--text-muted)' }}>
-            InventaPro v1.0 — Control de precisión
+            MXQ-STOCK v1.0 — Precision Control
           </p>
         </div>
       </div>

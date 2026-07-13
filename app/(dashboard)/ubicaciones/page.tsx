@@ -76,7 +76,7 @@ export default function UbicacionesPage() {
   }
 
   async function guardar() {
-    if (!form.nombre.trim()) { toast.error('El nombre es requerido'); return }
+    if (!form.nombre.trim()) { toast.error('Name is required'); return }
     setSaving(true)
     const url = editando ? `/api/ubicaciones/${editando.id}` : '/api/ubicaciones'
     const method = editando ? 'PUT' : 'POST'
@@ -90,7 +90,7 @@ export default function UbicacionesPage() {
       body: JSON.stringify(body),
     })
     if (res.ok) {
-      toast.success(editando ? 'Ubicación actualizada' : 'Ubicación creada')
+      toast.success(editando ? 'Location updated' : 'Location created')
       setModalOpen(false)
       setEditando(null)
       fetchUbicaciones()
@@ -105,7 +105,7 @@ export default function UbicacionesPage() {
     if (!confirmId) return
     const res = await fetch(`/api/ubicaciones/${confirmId}`, { method: 'DELETE' })
     if (res.ok) {
-      toast.success('Ubicación eliminada')
+      toast.success('Location deleted')
       setConfirmId(null)
       fetchUbicaciones()
     } else {
@@ -118,10 +118,10 @@ export default function UbicacionesPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold">Ubicaciones</h2>
+        <h2 className="font-display text-lg font-semibold">Locations</h2>
         {canEdit && (
           <Button size="sm" onClick={openCreate}>
-            <Plus size={14} /> Nueva ubicación
+            <Plus size={14} /> New Location
           </Button>
         )}
       </div>
@@ -131,7 +131,7 @@ export default function UbicacionesPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Ubicación', 'Niveles', 'Total artículos', 'Stock total', ''].map((h) => (
+                {['Location', 'Levels', 'Total Items', 'Total Stock', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -140,7 +140,7 @@ export default function UbicacionesPage() {
             <tbody>
               {ubicaciones.map((u) => (
                 <>
-                  {/* Fila principal */}
+                  {/* Main row */}
                   <tr
                     key={u.id}
                     className="cursor-pointer hover:bg-[var(--bg-tertiary)] transition-colors"
@@ -184,7 +184,7 @@ export default function UbicacionesPage() {
                     </td>
                   </tr>
 
-                  {/* Sub-filas de niveles (accordion) */}
+                  {/* Levels sub-rows (accordion) */}
                   <AnimatePresence>
                     {expandidos.has(u.id) && (
                       <tr key={`${u.id}-niveles`} style={{ borderBottom: '1px solid var(--border)' }}>
@@ -200,9 +200,9 @@ export default function UbicacionesPage() {
                               <thead>
                                 <tr style={{ borderBottom: '1px solid var(--border)' }}>
                                   <th className="pl-14 pr-4 py-2 text-left text-xs tracking-wider font-medium"
-                                    style={{ color: 'var(--text-muted)' }}>Nivel</th>
+                                    style={{ color: 'var(--text-muted)' }}>Level</th>
                                   <th className="px-4 py-2 text-left text-xs tracking-wider font-medium"
-                                    style={{ color: 'var(--text-muted)' }}>Artículos</th>
+                                    style={{ color: 'var(--text-muted)' }}>Items</th>
                                   <th className="px-4 py-2 text-left text-xs tracking-wider font-medium"
                                     style={{ color: 'var(--text-muted)' }}>Stock</th>
                                 </tr>
@@ -241,40 +241,40 @@ export default function UbicacionesPage() {
           </table>
           {ubicaciones.length === 0 && (
             <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>
-              No hay ubicaciones registradas
+              No locations registered
             </p>
           )}
         </div>
       )}
 
       <Modal open={modalOpen} onClose={() => setModalOpen(false)}
-        title={editando ? 'Editar ubicación' : 'Nueva ubicación'} size="sm">
+        title={editando ? 'Edit Location' : 'New Location'} size="sm">
         <div className="space-y-4">
-          <Input label="Nombre *" value={form.nombre}
+          <Input label="Name *" value={form.nombre}
             onChange={(e) => setForm(f => ({ ...f, nombre: e.target.value }))}
-            placeholder="Ej. A1, Bodega-3" />
-          <Input label="Descripción" value={form.descripcion}
+            placeholder="E.g. A1, Warehouse-3" />
+          <Input label="Description" value={form.descripcion}
             onChange={(e) => setForm(f => ({ ...f, descripcion: e.target.value }))} />
           {!editando && (
             <Input
-              label="Número de niveles"
+              label="Number of Levels"
               type="number"
               value={form.nivelesCount}
               onChange={(e) => setForm(f => ({ ...f, nivelesCount: Math.min(20, Math.max(1, Number(e.target.value))) }))}
             />
           )}
           <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancelar</Button>
-            <Button onClick={guardar} loading={saving}>Guardar</Button>
+            <Button variant="ghost" onClick={() => setModalOpen(false)}>Cancel</Button>
+            <Button onClick={guardar} loading={saving}>Save</Button>
           </div>
         </div>
       </Modal>
 
       <ConfirmDialog
         open={!!confirmId} onClose={() => setConfirmId(null)} onConfirm={eliminar}
-        title="Eliminar ubicación"
-        message="¿Estás seguro? No se puede eliminar si tiene artículos en sus niveles."
-        confirmLabel="Eliminar" variant="danger"
+        title="Delete Location"
+        message="Are you sure? Cannot delete if it has items in its levels."
+        confirmLabel="Delete" variant="danger"
       />
     </div>
   )

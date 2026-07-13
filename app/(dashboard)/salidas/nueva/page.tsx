@@ -155,8 +155,8 @@ export default function NuevaSalidaPage() {
       </div>
 
       <div className="flex gap-3 justify-end">
-        <Button variant="ghost" onClick={() => router.push('/salidas')}>Cancelar</Button>
-        <Button onClick={submit} loading={saving}>Registrar salida</Button>
+        <Button variant="ghost" onClick={() => router.push('/salidas')}>Cancel</Button>
+        <Button onClick={submit} loading={saving}>Record Exit</Button>
       </div>
     </div>
   )

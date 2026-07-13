@@ -27,9 +27,9 @@ interface Apartado {
 }
 
 const estadoBadge: Record<string, { label: string; variant: 'success' | 'danger' | 'default'; icon: React.ReactNode }> = {
-  CONVERTIDO_SALIDA: { label: 'Convertido a salida', variant: 'success', icon: <CheckCircle2 size={11} /> },
-  CANCELADO:         { label: 'Cancelado',            variant: 'default', icon: <XCircle size={11} /> },
-  VENCIDO:           { label: 'Vencido',              variant: 'danger',  icon: <Timer size={11} /> },
+  CONVERTIDO_SALIDA: { label: 'Converted to exit', variant: 'success', icon: <CheckCircle2 size={11} /> },
+  CANCELADO:         { label: 'Cancelled',         variant: 'default', icon: <XCircle size={11} /> },
+  VENCIDO:           { label: 'Expired',           variant: 'danger',  icon: <Timer size={11} /> },
 }
 
 export default function ApartadosPage() {
@@ -86,7 +86,7 @@ export default function ApartadosPage() {
 
   async function crearApartado() {
     if (formItems.some((i) => !i.articuloId || i.cantidad < 1)) {
-      toast.error('Completa todos los artículos')
+      toast.error('Complete all items')
       return
     }
     setSaving(true)
@@ -96,7 +96,7 @@ export default function ApartadosPage() {
       body: JSON.stringify({ proyectoId: proyectoId || undefined, notas, items: formItems }),
     })
     if (res.ok) {
-      toast.success('Apartado creado')
+      toast.success('Reserve created')
       setShowForm(false)
       setFormItems([{ articuloId: '', cantidad: 1 }])
       setProyectoId('')
@@ -112,7 +112,7 @@ export default function ApartadosPage() {
   async function cancelarApartado(id: string) {
     const res = await fetch(`/api/apartados/${id}`, { method: 'DELETE' })
     if (res.ok) {
-      toast.success('Apartado cancelado')
+      toast.success('Reserve cancelled')
       fetchApartados()
       if (tab === 'historial') fetchHistorial()
     }
@@ -121,7 +121,7 @@ export default function ApartadosPage() {
   async function convertirASalida(id: string) {
     const res = await fetch(`/api/apartados/${id}/convertir`, { method: 'POST' })
     if (res.ok) {
-      toast.success('Apartado convertido a salida')
+      toast.success('Reserve converted to exit')
       fetchApartados()
       if (tab === 'historial') fetchHistorial()
     } else {
@@ -132,9 +132,9 @@ export default function ApartadosPage() {
 
   const vencimientoLabel = (fecha: string) => {
     const dias = differenceInDays(new Date(fecha), new Date())
-    if (isPast(new Date(fecha))) return { text: 'Vencido', color: 'var(--accent-danger)' }
-    if (dias <= 1) return { text: `Vence en ${dias}d`, color: 'var(--accent-warning)' }
-    return { text: `${dias} días`, color: 'var(--text-muted)' }
+    if (isPast(new Date(fecha))) return { text: 'Expired', color: 'var(--accent-danger)' }
+    if (dias <= 1) return { text: `Expires in ${dias}d`, color: 'var(--accent-warning)' }
+    return { text: `${dias} days`, color: 'var(--text-muted)' }
   }
 
   if (loading) return <div className="grid grid-cols-1 md:grid-cols-2 gap-4">{Array.from({ length: 4 }).map((_, i) => <SkeletonCard key={i} />)}</div>
@@ -152,7 +152,7 @@ export default function ApartadosPage() {
               color: tab === 'activos' ? '#fff' : 'var(--text-secondary)',
             }}
           >
-            Activos {apartados.length > 0 && `(${apartados.length})`}
+            Active {apartados.length > 0 && `(${apartados.length})`}
           </button>
           <button
             onClick={() => setTab('historial')}
@@ -162,15 +162,15 @@ export default function ApartadosPage() {
               color: tab === 'historial' ? 'var(--text-primary)' : 'var(--text-secondary)',
             }}
           >
-            <History size={13} /> Historial
+            <History size={13} /> History
           </button>
         </div>
         {tab === 'activos' && (
           <div className="flex gap-2">
             <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
-              <Upload size={14} /> Cargar CSV
+              <Upload size={14} /> Upload CSV
             </Button>
-            <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> Nuevo apartado</Button>
+            <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> New Reserve</Button>
           </div>
         )}
         {csvOpen && (
@@ -193,7 +193,7 @@ export default function ApartadosPage() {
                       <p className="text-sm font-medium">{a.usuario.nombre}</p>
                       {a.proyecto && <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{a.proyecto.nombre}</p>}
                       <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                        Creado {formatDate(a.createdAt)}
+                        Created {formatDate(a.createdAt)}
                       </p>
                     </div>
                     <div className="flex items-center gap-1.5">
@@ -218,11 +218,11 @@ export default function ApartadosPage() {
                     <div className="flex gap-2">
                       {rol !== 'USUARIO' && (
                         <Button variant="secondary" size="sm" onClick={() => convertirASalida(a.id)}>
-                          Convertir a salida
+                          Convert to exit
                         </Button>
                       )}
                       <Button variant="danger" size="sm" onClick={() => cancelarApartado(a.id)}>
-                        Cancelar
+                        Cancel
                       </Button>
                     </div>
                   )}
@@ -232,7 +232,7 @@ export default function ApartadosPage() {
           </div>
           {apartados.length === 0 && (
             <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
-              No hay apartados activos
+              No active reserves
             </p>
           )}
         </>
@@ -247,14 +247,14 @@ export default function ApartadosPage() {
             </div>
           ) : historial.length === 0 ? (
             <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>
-              Sin registros en el historial
+              No history records
             </p>
           ) : (
             <div className="card-industrial overflow-hidden">
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Usuario', 'Proyecto', 'Artículos', 'Creado', 'Expiración', 'Resultado'].map((h) => (
+                    {['User', 'Project', 'Items', 'Created', 'Expiration', 'Result'].map((h) => (
                       <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                         style={{ color: 'var(--text-muted)' }}>{h}</th>
                     ))}
@@ -281,7 +281,7 @@ export default function ApartadosPage() {
                               </p>
                             ))}
                             {a.items.length > 2 && (
-                              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{a.items.length - 2} más</p>
+                              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{a.items.length - 2} more</p>
                             )}
                           </div>
                         </td>
@@ -310,21 +310,21 @@ export default function ApartadosPage() {
         </>
       )}
 
-      {/* Modal Nuevo apartado */}
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nuevo apartado" size="lg">
+      {/* Modal New Reserve */}
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="New Reserve" size="lg">
         <div className="space-y-4">
-          {/* Aviso de vencimiento */}
+          {/* Expiration notice */}
           <div className="p-4 rounded-lg border" style={{ background: 'color-mix(in srgb, var(--accent-warning) 8%, transparent)', borderColor: 'var(--accent-warning)' }}>
             <div className="flex items-start gap-2">
               <AlertTriangle size={16} style={{ color: 'var(--accent-warning)', flexShrink: 0, marginTop: 2 }} />
               <div>
                 <p className="text-sm font-semibold" style={{ color: 'var(--accent-warning)' }}>
-                  Aviso importante
+                  Important Notice
                 </p>
                 <p className="text-xs mt-1" style={{ color: 'var(--text-secondary)' }}>
-                  Los artículos apartados quedan reservados por <strong>7 días calendario</strong> a partir de hoy
-                  ({formatDate(addDays(new Date(), 7))}). Después de esa fecha, el apartado se marcará como vencido
-                  y los artículos quedarán disponibles automáticamente.
+                  Reserved items are held for <strong>7 calendar days</strong> from today
+                  ({formatDate(addDays(new Date(), 7))}). After that date, the reserve will be marked as expired
+                  and items will become available automatically.
                 </p>
               </div>
             </div>
@@ -333,45 +333,45 @@ export default function ApartadosPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>
-                Proyecto (opcional)
+                Project (optional)
               </label>
               <select value={proyectoId} onChange={(e) => setProyectoId(e.target.value)}
                 className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
                 style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
-                <option value="">Sin proyecto</option>
+                <option value="">No project</option>
                 {proyectos.map((p: any) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
               </select>
             </div>
-            <Input label="Notas (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
+            <Input label="Notes (optional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
           </div>
 
           <div className="space-y-2">
             <div className="flex items-center justify-between">
-              <label className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Artículos</label>
+              <label className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-secondary)' }}>Items</label>
               <Button variant="ghost" size="sm" onClick={() => setFormItems((f) => [...f, { articuloId: '', cantidad: 1 }])}>
-                <Plus size={12} /> Agregar
+                <Plus size={12} /> Add
               </Button>
             </div>
             {/* Header */}
             <div className="hidden sm:grid grid-cols-12 gap-3 px-1 pb-0.5">
-              <div className="col-span-9 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Artículo</div>
-              <div className="col-span-2 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Cantidad</div>
+              <div className="col-span-9 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Item</div>
+              <div className="col-span-2 text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Quantity</div>
             </div>
             {formItems.map((item, i) => (
               <div key={i} className="grid grid-cols-12 gap-3 items-center p-2 rounded-lg"
                 style={{ background: 'var(--bg-tertiary)' }}>
                 <div className="col-span-12 sm:col-span-9">
-                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Artículo</label>
+                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Item</label>
                   <select value={item.articuloId}
                     onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, articuloId: e.target.value } : fi))}
                     className="w-full px-3 py-2 rounded-md text-sm outline-none border"
                     style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
-                    <option value="">Seleccionar artículo...</option>
+                    <option value="">Select item...</option>
                     {articulos.map((a: any) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                   </select>
                 </div>
                 <div className="col-span-10 sm:col-span-2">
-                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Cantidad</label>
+                  <label className="sm:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Quantity</label>
                   <input type="number" min={0.001} step="any" value={item.cantidad}
                     onChange={(e) => setFormItems((f) => f.map((fi, idx) => idx === i ? { ...fi, cantidad: parseFloat(e.target.value) || 1 } : fi))}
                     className="w-full px-3 py-2 rounded-md text-sm outline-none border text-center font-mono-data"
@@ -390,8 +390,8 @@ export default function ApartadosPage() {
           </div>
 
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
-            <Button onClick={crearApartado} loading={saving}>Crear apartado</Button>
+            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button onClick={crearApartado} loading={saving}>Create Reserve</Button>
           </div>
         </div>
       </Modal>

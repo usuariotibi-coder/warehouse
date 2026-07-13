@@ -12,17 +12,17 @@ import { cn } from '@/lib/utils'
 
 const navItems = [
   { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard, roles: ['ADMIN'] },
-  { href: '/almacen', label: 'Almacén', icon: Warehouse, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
-  { href: '/entradas', label: 'Entradas', icon: ArrowDownToLine, roles: ['ADMIN', 'ALMACENISTA'] },
-  { href: '/salidas', label: 'Salidas', icon: ArrowUpFromLine, roles: ['ADMIN', 'ALMACENISTA'] },
-  { href: '/apartados', label: 'Apartados', icon: Bookmark, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
-  { href: '/articulos', label: 'Artículos', icon: Package, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
-  { href: '/ubicaciones', label: 'Ubicaciones', icon: MapPin, roles: ['ADMIN', 'ALMACENISTA'] },
-  { href: '/proyectos', label: 'Proyectos', icon: FolderOpen, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
-  { href: '/reportes', label: 'Reportes', icon: BarChart3, roles: ['ADMIN'] },
-  { href: '/usuarios', label: 'Usuarios', icon: Users, roles: ['ADMIN'] },
-  { href: '/perfil', label: 'Mi perfil', icon: User, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
-  { href: '/ayuda', label: 'Ayuda', icon: HelpCircle, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/almacen', label: 'Warehouse', icon: Warehouse, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/entradas', label: 'Entries', icon: ArrowDownToLine, roles: ['ADMIN', 'ALMACENISTA'] },
+  { href: '/salidas', label: 'Exits', icon: ArrowUpFromLine, roles: ['ADMIN', 'ALMACENISTA'] },
+  { href: '/apartados', label: 'Reserves', icon: Bookmark, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/articulos', label: 'Items', icon: Package, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/ubicaciones', label: 'Locations', icon: MapPin, roles: ['ADMIN', 'ALMACENISTA'] },
+  { href: '/proyectos', label: 'Projects', icon: FolderOpen, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/reportes', label: 'Reports', icon: BarChart3, roles: ['ADMIN'] },
+  { href: '/usuarios', label: 'Users', icon: Users, roles: ['ADMIN'] },
+  { href: '/perfil', label: 'My Profile', icon: User, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
+  { href: '/ayuda', label: 'Help', icon: HelpCircle, roles: ['ADMIN', 'ALMACENISTA', 'USUARIO'] },
 ]
 
 interface SidebarProps {
@@ -81,7 +81,7 @@ export function Sidebar({ open, onClose, collapsed = false, onToggle }: SidebarP
               transition: 'font-size 200ms ease-in-out',
             }}
           >
-            {collapsed ? 'IP' : 'INVENTAPRO'}
+            {collapsed ? 'MXQ' : 'MXQ-STOCK'}
           </span>
           <button
             onClick={onClose}
@@ -151,14 +151,14 @@ export function Sidebar({ open, onClose, collapsed = false, onToggle }: SidebarP
             style={{ color: 'var(--sidebar-text-muted)' }}
             onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = 'var(--sidebar-hover-bg)' }}
             onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = '' }}
-            title={collapsed ? 'Expandir menú' : undefined}
+            title={collapsed ? 'Expand menu' : undefined}
           >
             {collapsed ? (
               <PanelLeftOpen size={16} />
             ) : (
               <>
                 <PanelLeftClose size={16} />
-                <span className="font-display tracking-wide">Colapsar menú</span>
+                <span className="font-display tracking-wide">Collapse menu</span>
               </>
             )}
           </button>

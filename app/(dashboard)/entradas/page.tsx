@@ -43,13 +43,13 @@ export default function EntradasPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold">Registro de entradas</h2>
+        <h2 className="font-display text-lg font-semibold">Entry Log</h2>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setCsvOpen(true)}>
-            <Upload size={14} /> Cargar CSV
+            <Upload size={14} /> Upload CSV
           </Button>
           <Link href="/entradas/nueva">
-            <Button size="sm"><Plus size={14} /> Nueva entrada</Button>
+            <Button size="sm"><Plus size={14} /> New Entry</Button>
           </Link>
         </div>
       </div>
@@ -65,7 +65,7 @@ export default function EntradasPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Fecha', 'Proyecto', 'Artículos', 'Almacenista', 'Estado', ''].map((h) => (
+                {['Date', 'Project', 'Items', 'Operator', 'Status', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -95,7 +95,7 @@ export default function EntradasPage() {
                           </p>
                         ))}
                         {e.lotes.length > 2 && (
-                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{e.lotes.length - 2} más</p>
+                          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>+{e.lotes.length - 2} more</p>
                         )}
                       </div>
                     </td>
@@ -105,15 +105,15 @@ export default function EntradasPage() {
                     <td className="px-4 py-3">
                       {sinPrecio ? (
                         <Badge variant="warning">
-                          <AlertCircle size={10} className="mr-1" />Sin precio
+                          <AlertCircle size={10} className="mr-1" />No price
                         </Badge>
                       ) : (
-                        <Badge variant="success">Con precio</Badge>
+                        <Badge variant="success">Priced</Badge>
                       )}
                     </td>
                     <td className="px-4 py-3">
                       <Link href={`/entradas/${e.id}`}>
-                        <Button variant="ghost" size="sm">Ver</Button>
+                        <Button variant="ghost" size="sm">View</Button>
                       </Link>
                     </td>
                   </motion.tr>
@@ -123,7 +123,7 @@ export default function EntradasPage() {
           </table>
           {entradas.length === 0 && (
             <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>
-              No hay entradas registradas
+              No entries registered
             </p>
           )}
         </div>

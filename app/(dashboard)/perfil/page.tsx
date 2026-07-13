@@ -54,14 +54,14 @@ export default function PerfilPage() {
       setToken(data.token)
       setPaso('token')
     } else {
-      toast.error('Error al generar token')
+      toast.error('Error generating token')
     }
   }
 
   async function cambiarPassword(e: React.FormEvent) {
     e.preventDefault()
     if (pwNueva !== pwConfirmar) {
-      toast.error('Las contraseñas no coinciden')
+      toast.error('Passwords do not match')
       return
     }
     setPwLoading(true)
@@ -77,9 +77,9 @@ export default function PerfilPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        toast.error(data.error ?? 'Error al cambiar contraseña')
+        toast.error(data.error ?? 'Error changing password')
       } else {
-        toast.success('Contraseña actualizada correctamente')
+        toast.success('Password updated successfully')
         setPwActual('')
         setPwNueva('')
         setPwConfirmar('')
@@ -95,9 +95,9 @@ export default function PerfilPage() {
 
   return (
     <div className="max-w-lg space-y-6">
-      {/* Cuenta */}
+      {/* Account */}
       <div className="card-industrial p-5">
-        <h2 className="font-display text-lg font-semibold mb-4">Información de cuenta</h2>
+        <h2 className="font-display text-lg font-semibold mb-4">Account Information</h2>
         <div className="space-y-3">
           <div className="flex items-center gap-3 p-3 rounded-lg" style={{ background: 'var(--bg-tertiary)' }}>
             <div className="w-12 h-12 rounded-full flex items-center justify-center text-lg font-bold flex-shrink-0"

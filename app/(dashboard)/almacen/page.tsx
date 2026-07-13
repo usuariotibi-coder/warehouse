@@ -42,9 +42,9 @@ interface Ubicacion {
 
 const TIPOS: TipoSeparador[] = ['NINGUNO', 'PASILLO', 'MURO']
 const TIPO_LABELS: Record<TipoSeparador, string> = {
-  NINGUNO: 'Sin separador',
-  PASILLO: '— Pasillo',
-  MURO: '═ Muro',
+  NINGUNO: 'No separator',
+  PASILLO: '— Aisle',
+  MURO: '═ Wall',
 }
 
 export default function AlmacenPage() {
@@ -97,7 +97,7 @@ export default function AlmacenPage() {
       body: JSON.stringify(data),
     })
     if (res.ok) {
-      toast.success('Ubicación creada')
+      toast.success('Location created')
       setShowForm(false)
       reset()
       fetchUbicaciones()
@@ -151,7 +151,7 @@ export default function AlmacenPage() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar artículo, marca..."
+            placeholder="Search article, brand..."
             className="w-full pl-9 pr-3 py-2.5 rounded-md text-sm outline-none border"
             style={{
               background: 'var(--bg-secondary)',
@@ -162,7 +162,7 @@ export default function AlmacenPage() {
         </div>
         {rol !== 'USUARIO' && (
           <Button onClick={() => setShowForm(true)} size="sm">
-            <Plus size={14} /> Nueva ubicación
+            <Plus size={14} /> New Location
           </Button>
         )}
       </div>
@@ -173,7 +173,7 @@ export default function AlmacenPage() {
 
         return (
           <div key={prefix} className="space-y-3">
-            {/* Separador entre grupos */}
+            {/* Separator between groups */}
             {prevPrefix && (
               <div className="flex items-center gap-3 py-1">
                 <div className="flex-1">
@@ -208,7 +208,7 @@ export default function AlmacenPage() {
               </div>
             )}
 
-            {/* Grilla de ubicaciones */}
+            {/* Location grid */}
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3">
               {items.map((u, i) => (
                 <UbicacionCard
@@ -232,13 +232,13 @@ export default function AlmacenPage() {
 
       {ubicaciones.length === 0 && (
         <div className="text-center py-16" style={{ color: 'var(--text-muted)' }}>
-          <p>No hay ubicaciones registradas</p>
+          <p>No locations registered</p>
         </div>
       )}
 
       {query.trim() && matchingNiveles.size === 0 && (
         <div className="text-center py-8" style={{ color: 'var(--text-muted)' }}>
-          <p className="text-sm">No se encontraron artículos que coincidan con "{query}"</p>
+          <p className="text-sm">No articles found matching "{query}"</p>
         </div>
       )}
 
@@ -250,13 +250,13 @@ export default function AlmacenPage() {
         initialNivelId={selectedNivelId}
       />
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nueva ubicación" size="sm">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="New Location" size="sm">
         <form onSubmit={handleSubmit(crearUbicacion)} className="space-y-4">
-          <Input label="Nombre (ej: A1, B3)" error={errors.nombre?.message} {...register('nombre')} />
-          <Input label="Descripción (opcional)" {...register('descripcion')} />
+          <Input label="Name (e.g.: A1, B3)" error={errors.nombre?.message} {...register('nombre')} />
+          <Input label="Description (optional)" {...register('descripcion')} />
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" type="button" onClick={() => setShowForm(false)}>Cancelar</Button>
-            <Button type="submit" loading={saving}>Crear</Button>
+            <Button variant="ghost" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button type="submit" loading={saving}>Create</Button>
           </div>
         </form>
       </Modal>

@@ -46,7 +46,7 @@ export default function ProyectosPage() {
   useEffect(() => { fetchProyectos() }, [fetchProyectos])
 
   async function crearProyecto() {
-    if (!nombre.trim()) { toast.error('El nombre es requerido'); return }
+    if (!nombre.trim()) { toast.error('Name is required'); return }
     setSaving(true)
     const res = await fetch('/api/proyectos', {
       method: 'POST',
@@ -54,7 +54,7 @@ export default function ProyectosPage() {
       body: JSON.stringify({ nombre, descripcion, responsable }),
     })
     if (res.ok) {
-      toast.success('Proyecto creado')
+      toast.success('Project created')
       setShowForm(false)
       setNombre(''); setDescripcion(''); setResponsable('')
       fetchProyectos()
@@ -70,9 +70,9 @@ export default function ProyectosPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold">Proyectos</h2>
+        <h2 className="font-display text-lg font-semibold">Projects</h2>
         {rol === 'ADMIN' && (
-          <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> Nuevo proyecto</Button>
+          <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> New Project</Button>
         )}
       </div>
 
@@ -91,31 +91,31 @@ export default function ProyectosPage() {
               <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>{p.descripcion}</p>
             )}
             {p.responsable && (
-              <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>Responsable: {p.responsable}</p>
+              <p className="text-xs mb-3" style={{ color: 'var(--text-secondary)' }}>Responsible: {p.responsable}</p>
             )}
             <div className="flex gap-3 text-xs mb-3">
-              <span style={{ color: 'var(--text-muted)' }}>{p._count.salidas} salidas</span>
-              <span style={{ color: 'var(--text-muted)' }}>{p._count.apartados} apartados</span>
+              <span style={{ color: 'var(--text-muted)' }}>{p._count.salidas} exits</span>
+              <span style={{ color: 'var(--text-muted)' }}>{p._count.apartados} reserves</span>
             </div>
             <Link href={`/proyectos/${p.id}`}>
-              <Button variant="ghost" size="sm">Ver detalle</Button>
+              <Button variant="ghost" size="sm">View Details</Button>
             </Link>
           </motion.div>
         ))}
       </div>
 
       {proyectos.length === 0 && (
-        <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>No hay proyectos</p>
+        <p className="text-center py-16 text-sm" style={{ color: 'var(--text-muted)' }}>No projects</p>
       )}
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nuevo proyecto" size="sm">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="New Project" size="sm">
         <div className="space-y-4">
-          <Input label="Nombre *" value={nombre} onChange={(e) => setNombre(e.target.value)} />
-          <Input label="Descripción" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
-          <Input label="Responsable" value={responsable} onChange={(e) => setResponsable(e.target.value)} />
+          <Input label="Name *" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+          <Input label="Description" value={descripcion} onChange={(e) => setDescripcion(e.target.value)} />
+          <Input label="Responsible" value={responsable} onChange={(e) => setResponsable(e.target.value)} />
           <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
-            <Button onClick={crearProyecto} loading={saving}>Crear proyecto</Button>
+            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button onClick={crearProyecto} loading={saving}>Create Project</Button>
           </div>
         </div>
       </Modal>

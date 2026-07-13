@@ -78,7 +78,7 @@ export default function ArticulosPage() {
   async function crearApartado() {
     if (!apartandoId) return
     if (!apartadoForm.proyectoId) {
-      toast.error('Debes seleccionar un proyecto para apartar')
+      toast.error('You must select a project to reserve')
       return
     }
     setSavingApartado(true)
@@ -94,7 +94,7 @@ export default function ArticulosPage() {
       }),
     })
     if (res.ok) {
-      toast.success('Apartado creado correctamente')
+      toast.success('Reserve created successfully')
       setApartandoId(null)
       fetchArticulos()
     } else {
@@ -112,7 +112,7 @@ export default function ArticulosPage() {
       body: JSON.stringify(data),
     })
     if (res.ok) {
-      toast.success('Artículo creado')
+      toast.success('Item created')
       setShowForm(false)
       reset()
       fetchArticulos()
@@ -138,14 +138,14 @@ export default function ArticulosPage() {
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar artículo, marca, número de parte..."
+            placeholder="Search article, brand, part number..."
             className="w-full pl-9 pr-3 py-2.5 rounded-md text-sm outline-none border"
             style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
           />
         </div>
         {rol !== 'USUARIO' && (
           <Button onClick={() => setShowForm(true)} size="sm">
-            <Plus size={14} /> Nuevo artículo
+            <Plus size={14} /> New Item
           </Button>
         )}
       </div>
@@ -157,7 +157,7 @@ export default function ArticulosPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Artículo', 'Marca', 'N° Parte', 'Unidad', 'Apartado', 'Stock disponible', 'Ubicación(es)', ''].map((h) => (
+                {['Article', 'Brand', 'Part No.', 'Unit', 'Reserved', 'Available Stock', 'Location(s)', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -214,7 +214,7 @@ export default function ArticulosPage() {
                           </span>
                         )}
                         <Badge variant={stockBadge}>
-                          {stockDisponible === 0 ? 'Sin stock' : 'En stock'}
+                          {stockDisponible === 0 ? 'No stock' : 'In stock'}
                         </Badge>
                       </div>
                     </td>
@@ -228,12 +228,12 @@ export default function ArticulosPage() {
                       <div className="flex gap-1">
                         {stockDisponible > 0 && (
                           <Button variant="ghost" size="sm" onClick={() => abrirApartar(a)}
-                            title="Apartar">
+                            title="Reserve">
                             <Bookmark size={12} />
                           </Button>
                         )}
                         <Link href={`/articulos/${a.id}`}>
-                          <Button variant="ghost" size="sm">Ver</Button>
+                          <Button variant="ghost" size="sm">View</Button>
                         </Link>
                       </div>
                     </td>
@@ -244,24 +244,24 @@ export default function ArticulosPage() {
           </table>
           {articulos.length === 0 && (
             <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>
-              No hay artículos registrados
+              No articles registered
             </p>
           )}
         </div>
       )}
 
-      {/* Modal Apartar */}
+      {/* Modal Reserve */}
       <Modal
         open={!!apartandoId}
         onClose={() => setApartandoId(null)}
-        title="Apartar artículo"
+        title="Reserve Item"
         size="sm"
       >
         <div className="space-y-4">
           <div>
             <label className="block text-xs uppercase tracking-wider mb-1.5"
               style={{ color: 'var(--text-secondary)' }}>
-              Proyecto <span style={{ color: 'var(--accent-danger)' }}>*</span>
+              Project <span style={{ color: 'var(--accent-danger)' }}>*</span>
             </label>
             <select
               value={apartadoForm.proyectoId}
@@ -269,12 +269,12 @@ export default function ArticulosPage() {
               className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
               style={selectStyle}
             >
-              <option value="">Seleccionar proyecto...</option>
+              <option value="">Select project...</option>
               {proyectos.map(p => <option key={p.id} value={p.id}>{p.nombre}</option>)}
             </select>
           </div>
           <Input
-            label="Cantidad *"
+            label="Quantity *"
             type="number"
             min={1}
             value={apartadoForm.cantidad}
@@ -282,38 +282,38 @@ export default function ArticulosPage() {
           />
           <div className="rounded-md px-3 py-2.5 text-sm"
             style={{ background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
-            Vigencia: <span style={{ color: 'var(--text-primary)' }}>7 días calendario</span>
+            Valid for: <span style={{ color: 'var(--text-primary)' }}>7 calendar days</span>
           </div>
           <Input
-            label="Notas (opcional)"
+            label="Notes (optional)"
             value={apartadoForm.notas}
             onChange={(e) => setApartadoForm(f => ({ ...f, notas: e.target.value }))}
           />
           <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setApartandoId(null)}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setApartandoId(null)}>Cancel</Button>
             <Button onClick={crearApartado} loading={savingApartado} disabled={!apartadoForm.proyectoId}>
-              <Bookmark size={14} /> Apartar
+              <Bookmark size={14} /> Reserve
             </Button>
           </div>
         </div>
       </Modal>
 
-      {/* Modal Nuevo Artículo */}
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nuevo artículo">
+      {/* Modal New Item */}
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="New Item">
         <form onSubmit={handleSubmit(crearArticulo)} className="space-y-4">
-          <Input label="Nombre *" error={errors.nombre?.message} {...register('nombre')} />
+          <Input label="Name *" error={errors.nombre?.message} {...register('nombre')} />
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Marca" {...register('marca')} />
-            <Input label="Número de parte" {...register('numeroParte')} />
+            <Input label="Brand" {...register('marca')} />
+            <Input label="Part Number" {...register('numeroParte')} />
           </div>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Unidad" placeholder="pza" {...register('unidad')} />
-            <Input label="Stock mínimo" type="number" {...register('stockMinimo', { valueAsNumber: true })} />
+            <Input label="Unit" placeholder="pcs" {...register('unidad')} />
+            <Input label="Minimum Stock" type="number" {...register('stockMinimo', { valueAsNumber: true })} />
           </div>
-          <Input label="Descripción" {...register('descripcion')} />
+          <Input label="Description" {...register('descripcion')} />
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" type="button" onClick={() => setShowForm(false)}>Cancelar</Button>
-            <Button type="submit" loading={saving}>Crear artículo</Button>
+            <Button variant="ghost" type="button" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button type="submit" loading={saving}>Create Item</Button>
           </div>
         </form>
       </Modal>

@@ -10,7 +10,7 @@ export function ThemeToggle() {
   return (
     <button
       onClick={toggleTheme}
-      title={isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+      title={isDark ? 'Switch to light mode' : 'Switch to dark mode'}
       className="relative flex items-center rounded-full transition-colors flex-shrink-0"
       style={{
         width: 64,

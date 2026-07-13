@@ -8,24 +8,24 @@ import { usePathname } from 'next/navigation'
 
 const titles: Record<string, string> = {
   '/dashboard': 'Dashboard',
-  '/almacen': 'Vista del Almacén',
-  '/entradas': 'Entradas',
-  '/salidas': 'Salidas',
-  '/apartados': 'Apartados',
-  '/articulos': 'Catálogo de Artículos',
-  '/ubicaciones': 'Ubicaciones',
-  '/proyectos': 'Proyectos',
-  '/reportes': 'Reportes',
-  '/usuarios': 'Usuarios',
-  '/perfil': 'Mi Perfil',
-  '/ayuda': 'Ayuda',
+  '/almacen': 'Warehouse',
+  '/entradas': 'Entries',
+  '/salidas': 'Exits',
+  '/apartados': 'Reserves',
+  '/articulos': 'Items Catalog',
+  '/ubicaciones': 'Locations',
+  '/proyectos': 'Projects',
+  '/reportes': 'Reports',
+  '/usuarios': 'Users',
+  '/perfil': 'My Profile',
+  '/ayuda': 'Help',
 }
 
 export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
   const pathname = usePathname()
   const { data: session } = useSession()
 
-  const title = Object.entries(titles).find(([key]) => pathname.startsWith(key))?.[1] ?? 'InventaPro'
+  const title = Object.entries(titles).find(([key]) => pathname.startsWith(key))?.[1] ?? 'MXQ-STOCK'
 
   return (
     <header
@@ -51,7 +51,7 @@ export function Topbar({ onMenuClick }: { onMenuClick: () => void }) {
           style={{ color: 'var(--text-muted)' }}
         >
           <LogOut size={14} />
-          <span className="hidden sm:block">Salir</span>
+          <span className="hidden sm:block">Logout</span>
         </button>
       </div>
     </header>

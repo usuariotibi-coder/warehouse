@@ -39,7 +39,7 @@ export default function UsuariosPage() {
   useEffect(() => { fetchUsuarios() }, [fetchUsuarios])
 
   async function crearUsuario() {
-    if (!form.nombre || !form.email) { toast.error('Nombre y email son requeridos'); return }
+    if (!form.nombre || !form.email) { toast.error('Name and email are required'); return }
     setSaving(true)
     const res = await fetch('/api/usuarios', {
       method: 'POST',
@@ -49,9 +49,9 @@ export default function UsuariosPage() {
     if (res.ok) {
       const data = await res.json()
       if (data.tempPassword) {
-        toast.success(`Usuario creado. Contraseña temporal: ${data.tempPassword}`, { duration: 10000 })
+        toast.success(`User created. Temporary password: ${data.tempPassword}`, { duration: 10000 })
       } else {
-        toast.success('Usuario creado')
+        toast.success('User created')
       }
       setShowForm(false)
       setForm({ nombre: '', email: '', password: '', rol: 'USUARIO' })
@@ -70,7 +70,7 @@ export default function UsuariosPage() {
       body: JSON.stringify({ rol }),
     })
     if (res.ok) {
-      toast.success('Rol actualizado')
+      toast.success('Role updated')
       fetchUsuarios()
     }
   }
@@ -82,7 +82,7 @@ export default function UsuariosPage() {
       body: JSON.stringify({ activo: !u.activo }),
     })
     if (res.ok) {
-      toast.success(u.activo ? 'Usuario desactivado' : 'Usuario activado')
+      toast.success(u.activo ? 'User deactivated' : 'User activated')
       fetchUsuarios()
     }
   }
@@ -90,8 +90,8 @@ export default function UsuariosPage() {
   return (
     <div className="space-y-5">
       <div className="flex items-center justify-between">
-        <h2 className="font-display text-lg font-semibold">Gestión de usuarios</h2>
-        <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> Nuevo usuario</Button>
+        <h2 className="font-display text-lg font-semibold">User Management</h2>
+        <Button size="sm" onClick={() => setShowForm(true)}><Plus size={14} /> New User</Button>
       </div>
 
       {loading ? <SkeletonTable /> : (
@@ -99,7 +99,7 @@ export default function UsuariosPage() {
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Usuario', 'Email', 'Rol', 'Estado', 'Creado', ''].map((h) => (
+                {['User', 'Email', 'Role', 'Status', 'Created', ''].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}
@@ -126,20 +126,20 @@ export default function UsuariosPage() {
                       className="text-xs px-2 py-1 rounded border outline-none"
                       style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
                     >
-                      <option value="USUARIO">USUARIO</option>
-                      <option value="ALMACENISTA">ALMACENISTA</option>
-                      <option value="ADMIN">ADMIN</option>
+                      <option value="USUARIO">User</option>
+                      <option value="ALMACENISTA">Warehouse Operator</option>
+                      <option value="ADMIN">Admin</option>
                     </select>
                   </td>
                   <td className="px-4 py-3">
-                    <Badge variant={u.activo ? 'success' : 'default'}>{u.activo ? 'Activo' : 'Inactivo'}</Badge>
+                    <Badge variant={u.activo ? 'success' : 'default'}>{u.activo ? 'Active' : 'Inactive'}</Badge>
                   </td>
                   <td className="px-4 py-3 font-mono-data text-xs" style={{ color: 'var(--text-muted)' }}>
                     {formatDate(u.createdAt)}
                   </td>
                   <td className="px-4 py-3">
                     <Button variant="ghost" size="sm" onClick={() => toggleActivo(u)}>
-                      {u.activo ? 'Desactivar' : 'Activar'}
+                      {u.activo ? 'Deactivate' : 'Activate'}
                     </Button>
                   </td>
                 </tr>
@@ -149,14 +149,14 @@ export default function UsuariosPage() {
         </div>
       )}
 
-      <Modal open={showForm} onClose={() => setShowForm(false)} title="Nuevo usuario" size="sm">
+      <Modal open={showForm} onClose={() => setShowForm(false)} title="New User" size="sm">
         <div className="space-y-4">
-          <Input label="Nombre *" value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} />
+          <Input label="Name *" value={form.nombre} onChange={(e) => setForm((f) => ({ ...f, nombre: e.target.value }))} />
           <Input label="Email *" type="email" value={form.email} onChange={(e) => setForm((f) => ({ ...f, email: e.target.value }))} />
-          <Input label="Contraseña (opcional — se genera si no)" type="password"
+          <Input label="Password (optional — generated if not provided)" type="password"
             value={form.password} onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))} />
           <div>
-            <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Rol</label>
+            <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Role</label>
             <select value={form.rol} onChange={(e) => setForm((f) => ({ ...f, rol: e.target.value }))}
               className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
               style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}>
@@ -166,8 +166,8 @@ export default function UsuariosPage() {
             </select>
           </div>
           <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancelar</Button>
-            <Button onClick={crearUsuario} loading={saving}>Crear usuario</Button>
+            <Button variant="ghost" onClick={() => setShowForm(false)}>Cancel</Button>
+            <Button onClick={crearUsuario} loading={saving}>Create User</Button>
           </div>
         </div>
       </Modal>

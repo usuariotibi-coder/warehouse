@@ -62,18 +62,18 @@ export default function EntradaDetailPage() {
     })
 
     if (res.ok) {
-      toast.success('Precios asignados correctamente')
+      toast.success('Prices assigned successfully')
       setShowPrecioModal(false)
       const updated = await fetch(`/api/entradas/${id}`).then((r) => r.json())
       setEntrada(updated)
     } else {
-      toast.error('Error al asignar precios')
+      toast.error('Error assigning prices')
     }
     setSaving(false)
   }
 
   if (loading) return <SkeletonCard />
-  if (!entrada) return <p style={{ color: 'var(--text-muted)' }}>Entrada no encontrada</p>
+  if (!entrada) return <p style={{ color: 'var(--text-muted)' }}>Entry not found</p>
 
   const sinPrecio = entrada.lotes.some((l) => l.precioPendiente)
 
@@ -82,19 +82,19 @@ export default function EntradaDetailPage() {
       <div className="card-industrial p-5">
         <div className="flex items-start justify-between mb-4">
           <div>
-            <h2 className="font-display text-xl font-bold">Entrada #{entrada.id.slice(-6).toUpperCase()}</h2>
+            <h2 className="font-display text-xl font-bold">Entry #{entrada.id.slice(-6).toUpperCase()}</h2>
             <p className="text-sm mt-1" style={{ color: 'var(--text-muted)' }}>
-              {formatDateTime(entrada.fecha)} · por {entrada.usuario.nombre}
+              {formatDateTime(entrada.fecha)} · by {entrada.usuario.nombre}
             </p>
             {entrada.proyecto && (
               <p className="text-xs mt-1 font-medium" style={{ color: 'var(--accent-primary)' }}>
-                Proyecto: {entrada.proyecto.nombre}
+                Project: {entrada.proyecto.nombre}
               </p>
             )}
           </div>
           {rol === 'ADMIN' && sinPrecio && (
             <Button onClick={() => setShowPrecioModal(true)}>
-              Asignar precios
+              Assign Prices
             </Button>
           )}
         </div>
@@ -111,7 +111,7 @@ export default function EntradaDetailPage() {
               </div>
               <div className="text-right">
                 {lote.precioPendiente ? (
-                  <Badge variant="warning">Sin precio</Badge>
+                  <Badge variant="warning">No price</Badge>
                 ) : (
                   <span className="font-mono-data text-sm" style={{ color: 'var(--accent-primary)' }}>
                     {formatCurrency(lote.precioUnitario)}
@@ -124,7 +124,7 @@ export default function EntradaDetailPage() {
       </div>
 
       <Modal open={showPrecioModal} onClose={() => setShowPrecioModal(false)}
-        title="Asignar precios a lotes" size="md">
+        title="Assign prices to lots" size="md">
         <div className="space-y-3">
           {entrada.lotes.map((lote) => (
             <div key={lote.id} className="flex items-center gap-3">
@@ -146,8 +146,8 @@ export default function EntradaDetailPage() {
             </div>
           ))}
           <div className="flex gap-3 justify-end pt-2">
-            <Button variant="ghost" onClick={() => setShowPrecioModal(false)}>Cancelar</Button>
-            <Button onClick={asignarPrecios} loading={saving}>Guardar precios</Button>
+            <Button variant="ghost" onClick={() => setShowPrecioModal(false)}>Cancel</Button>
+            <Button onClick={asignarPrecios} loading={saving}>Save Prices</Button>
           </div>
         </div>
       </Modal>

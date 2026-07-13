@@ -24,6 +24,7 @@ export async function GET() {
     apartadosProximosVencer,
     proyectosActivos,
     entradasPorProyecto,
+    salidasPorProyecto,
   ] = await Promise.all([
     prisma.loteEntrada.count({ where: { precioPendiente: true, cantidadDisponible: { gt: 0 } } }),
     prisma.loteEntrada.findMany({
@@ -55,11 +56,47 @@ export async function GET() {
       ORDER BY valor DESC
       LIMIT 10
     `,
+    prisma.$queryRaw<Array<{ proyecto: string; valor: number; salidas: number }>>`
+      SELECT
+        COALESCE(p.nombre, 'Sin proyecto') as proyecto,
+        COALESCE(SUM(si."costoTotal"), 0)::float as valor,
+        COUNT(DISTINCT s.id)::int as salidas
+      FROM "Salida" s
+      LEFT JOIN "Proyecto" p ON p.id = s."proyectoId"
+      LEFT JOIN "SalidaItem" si ON si."salidaId" = s.id
+      GROUP BY COALESCE(p.nombre, 'Sin proyecto')
+      ORDER BY valor DESC
+      LIMIT 10
+    `,
   ])
 
   const valorInventario = loteConPrecio.reduce(
     (sum, l) => sum + (l.cantidadDisponible * (l.precioUnitario ?? 0)), 0
   )
+
+  // Merge entradas y salidas por proyecto
+  const proyectoMap = new Map<string, any>()
+
+  entradasPorProyecto.forEach(e => {
+    proyectoMap.set(e.proyecto, {
+      proyecto: e.proyecto,
+      entradas: e.entradas,
+      valorEntradas: e.valor,
+      salidas: 0,
+      valorSalidas: 0,
+    })
+  })
+
+  salidasPorProyecto.forEach(s => {
+    const existing = proyectoMap.get(s.proyecto) || { proyecto: s.proyecto, entradas: 0, valorEntradas: 0 }
+    proyectoMap.set(s.proyecto, {
+      ...existing,
+      salidas: s.salidas,
+      valorSalidas: s.valor,
+    })
+  })
+
+  const resumenPorProyecto = Array.from(proyectoMap.values()).sort((a, b) => b.valorSalidas - a.valorSalidas)
 
   return successResponse({
     valorInventario,
@@ -69,7 +106,7 @@ export async function GET() {
     lotesSinPrecio,
     apartadosProximosVencer,
     proyectosActivos,
-    entradasPorProyecto,
+    resumenPorProyecto,
   })
 }
 
