@@ -127,9 +127,10 @@ export default function SalidasPage() {
                       ) : (
                         <Badge variant="success">Complete</Badge>
                       )}
-                  </td>
-                </motion.tr>
-              ))}
+                    </td>
+                  </motion.tr>
+                )
+              })}
             </tbody>
           </table>
           {salidas.length === 0 && (

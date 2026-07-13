@@ -4,6 +4,7 @@ import { requireAuth, getPaginationParams } from '@/lib/apiHelpers'
 import { ApartadoSchema } from '@/lib/validations'
 import { errorResponse, successResponse } from '@/lib/utils'
 import { addDays } from 'date-fns'
+import { calcularFIFO } from '@/lib/fifo'
 
 export async function GET(req: Request) {
   const { error } = await requireAuth()
@@ -38,7 +39,29 @@ export async function GET(req: Request) {
     prisma.apartado.count({ where }),
   ])
 
-  return successResponse({ apartados, total })
+  // Calcular costo estimado FIFO para apartados activos
+  const apartadosConCosto = await Promise.all(
+    apartados.map(async (a) => {
+      let costoEstimado = 0
+      let tieneLotesSinPrecio = false
+
+      for (const item of a.items) {
+        const fifo = await calcularFIFO(item.articuloId, item.cantidad)
+        if (fifo.costoTotal != null) {
+          costoEstimado += fifo.costoTotal
+        } else {
+          tieneLotesSinPrecio = true
+        }
+      }
+
+      return {
+        ...a,
+        costoEstimado: tieneLotesSinPrecio ? null : costoEstimado,
+      }
+    })
+  )
+
+  return successResponse({ apartados: apartadosConCosto, total })
 }
 
 export async function POST(req: Request) {

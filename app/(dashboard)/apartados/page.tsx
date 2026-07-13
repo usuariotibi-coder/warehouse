@@ -6,10 +6,10 @@ import { Badge } from '@/components/ui/Badge'
 import { Modal } from '@/components/ui/Modal'
 import { Input } from '@/components/ui/Input'
 import { SkeletonCard } from '@/components/ui/Skeleton'
-import { formatDate } from '@/lib/utils'
+import { formatDate, formatCurrency } from '@/lib/utils'
 import { useSession } from 'next-auth/react'
 import { toast } from 'sonner'
-import { Plus, Trash2, AlertTriangle, Clock, Upload, History, CheckCircle2, XCircle, Timer } from 'lucide-react'
+import { Plus, Trash2, AlertTriangle, Clock, Upload, History, CheckCircle2, XCircle, Timer, Info } from 'lucide-react'
 import { CSVUploader } from '@/components/csv/CSVUploader'
 import { addDays, differenceInDays, isPast } from 'date-fns'
 import { motion } from 'framer-motion'
@@ -21,6 +21,7 @@ interface Apartado {
   updatedAt: string
   createdAt: string
   notas?: string | null
+  costoEstimado?: number | null
   usuario: { id: string; nombre: string }
   proyecto?: { nombre: string } | null
   items: Array<{ articulo: { nombre: string; unidad: string }; cantidad: number }>
@@ -202,7 +203,7 @@ export default function ApartadosPage() {
                     </div>
                   </div>
 
-                  <div className="space-y-1 mb-3">
+                  <div className="space-y-1 mb-4">
                     {a.items.map((item, j) => (
                       <div key={j} className="flex justify-between text-xs p-2 rounded"
                         style={{ background: 'var(--bg-tertiary)' }}>
@@ -212,6 +213,23 @@ export default function ApartadosPage() {
                         </span>
                       </div>
                     ))}
+                  </div>
+
+                  <div className="space-y-2 mb-3">
+                    <div className="flex items-center justify-between p-2.5 rounded-lg"
+                      style={{ background: 'color-mix(in srgb, var(--accent-primary) 8%, transparent)', border: '1px solid var(--accent-primary)' }}>
+                      <span className="text-xs font-medium" style={{ color: 'var(--text-secondary)' }}>Reserve Value</span>
+                      <span className="text-sm font-mono-data font-bold" style={{ color: 'var(--accent-primary)' }}>
+                        {a.costoEstimado != null ? formatCurrency(a.costoEstimado) : '—'}
+                      </span>
+                    </div>
+                    <div className="flex gap-2 items-start p-2 rounded-lg text-xs"
+                      style={{ background: 'color-mix(in srgb, var(--accent-warning) 6%, transparent)', borderLeft: '2px solid var(--accent-warning)' }}>
+                      <Info size={13} style={{ color: 'var(--accent-warning)', flexShrink: 0, marginTop: 1 }} />
+                      <span style={{ color: 'var(--text-secondary)' }}>
+                        Expected value using current available inventory. Actual cost may vary based on stock availability at exit time.
+                      </span>
+                    </div>
                   </div>
 
                   {canEdit && (
