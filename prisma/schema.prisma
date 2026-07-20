@@ -74,8 +74,7 @@ model Ubicacion {
   createdAt    DateTime @default(now())
   updatedAt    DateTime @updatedAt
 
-  articuloUbicaciones ArticuloUbicacion[]
-  niveles             Nivel[]
+  niveles Nivel[]
 }
 
 model Nivel {
@@ -112,7 +111,6 @@ model ArticuloNivel {
   @@index([articuloId])
 }
 
-
 model Proyecto {
   id          String         @id @default(cuid())
   nombre      String         @unique
@@ -129,6 +127,16 @@ model Proyecto {
   apartados Apartado[]
 }
 
+model Proveedor {
+  id        String   @id @default(cuid())
+  nombre    String   @unique
+  activo    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  lotesEntrada LoteEntrada[]
+}
+
 model Articulo {
   id          String   @id @default(cuid())
   nombre      String
@@ -142,7 +150,6 @@ model Articulo {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  ubicaciones     ArticuloUbicacion[]
   articuloNiveles ArticuloNivel[]
   lotesEntrada    LoteEntrada[]
   apartadoItems   ApartadoItem[]
@@ -150,21 +157,6 @@ model Articulo {
 
   @@index([nombre])
   @@index([marca])
-}
-
-model ArticuloUbicacion {
-  id          String   @id @default(cuid())
-  articuloId  String
-  ubicacionId String
-  cantidad    Float    @default(0)
-  updatedAt   DateTime @updatedAt
-
-  articulo  Articulo  @relation(fields: [articuloId], references: [id])
-  ubicacion Ubicacion @relation(fields: [ubicacionId], references: [id])
-
-  @@unique([articuloId, ubicacionId])
-  @@index([articuloId])
-  @@index([ubicacionId])
 }
 
 model Entrada {
@@ -189,6 +181,7 @@ model LoteEntrada {
   articuloId         String
   ubicacionId        String?
   nivelId            String?
+  proveedorId        String?
   cantidadOriginal   Float
   cantidadDisponible Float
   precioUnitario     Float?
@@ -198,6 +191,7 @@ model LoteEntrada {
 
   entrada       Entrada        @relation(fields: [entradaId], references: [id])
   articulo      Articulo       @relation(fields: [articuloId], references: [id])
+  proveedor     Proveedor?     @relation(fields: [proveedorId], references: [id])
   salidaItems   SalidaItem[]
   apartadoItems ApartadoItem[]
 
