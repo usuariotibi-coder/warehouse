@@ -41,7 +41,7 @@ export default function NuevaSalidaPage() {
 
   async function submit() {
     if (items.some((i) => !i.articuloId || i.cantidad < 1)) {
-      toast.error('Completa todos los artículos y cantidades')
+      toast.error('Complete all items and quantities')
       return
     }
     setSaving(true)
@@ -51,7 +51,7 @@ export default function NuevaSalidaPage() {
       body: JSON.stringify({ proyectoId: proyectoId || undefined, notas: notas || undefined, items }),
     })
     if (res.ok) {
-      toast.success('Salida registrada')
+      toast.success('Exit registered')
       router.push('/salidas')
     } else {
       const err = await res.json()
@@ -66,21 +66,21 @@ export default function NuevaSalidaPage() {
         <div className="flex items-center gap-2 mb-1">
           <AlertTriangle size={14} style={{ color: 'var(--accent-warning)' }} />
           <p className="text-sm font-medium" style={{ color: 'var(--accent-warning)' }}>
-            Los precios se calculan automáticamente con el método FIFO
+            Prices are calculated automatically using the FIFO method
           </p>
         </div>
         <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-          Si hay lotes sin precio asignado, el costo total no se calculará hasta que el admin los asigne.
+          If there are lots without an assigned price, the total cost will not be calculated until the admin assigns them.
         </p>
       </div>
 
       <div className="card-industrial p-5">
         <div className="flex items-center gap-6">
-          <h2 className="font-display text-lg font-semibold whitespace-nowrap">Datos generales</h2>
+          <h2 className="font-display text-lg font-semibold whitespace-nowrap">General data</h2>
           <div className="flex-1 grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>
-                Proyecto destino (opcional)
+                Target project (optional)
               </label>
               <select
                 value={proyectoId}
@@ -88,26 +88,26 @@ export default function NuevaSalidaPage() {
                 className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
                 style={{ background: 'var(--bg-tertiary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               >
-                <option value="">Sin proyecto</option>
+                <option value="">No project</option>
                 {proyectos.map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
               </select>
             </div>
-            <Input label="Notas (opcional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
+            <Input label="Notes (optional)" value={notas} onChange={(e) => setNotas(e.target.value)} />
           </div>
         </div>
       </div>
 
       <div className="card-industrial p-5 space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-semibold">Artículos</h2>
-          <Button variant="outline" size="sm" onClick={addItem}><Plus size={14} /> Agregar</Button>
+          <h2 className="font-display text-lg font-semibold">Items</h2>
+          <Button variant="outline" size="sm" onClick={addItem}><Plus size={14} /> Add</Button>
         </div>
 
         {/* Header */}
         <div className="hidden md:grid grid-cols-12 gap-3 px-3 pb-1">
           {[
-            { label: 'Artículo', span: 'col-span-10' },
-            { label: 'Cantidad', span: 'col-span-1' },
+            { label: 'Item', span: 'col-span-10' },
+            { label: 'Qty', span: 'col-span-1' },
             { label: '', span: 'col-span-1' },
           ].map(({ label, span }) => (
             <div key={label} className={`${span} text-xs uppercase tracking-wider`} style={{ color: 'var(--text-muted)' }}>
@@ -120,19 +120,19 @@ export default function NuevaSalidaPage() {
           <div key={i} className="grid grid-cols-12 gap-3 items-center p-3 rounded-lg"
             style={{ background: 'var(--bg-tertiary)' }}>
             <div className="col-span-12 md:col-span-10">
-              <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Artículo</label>
+              <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Item</label>
               <select
                 value={item.articuloId}
                 onChange={(e) => updateItem(i, 'articuloId', e.target.value)}
                 className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
                 style={{ background: 'var(--bg-secondary)', borderColor: 'var(--border)', color: 'var(--text-primary)' }}
               >
-                <option value="">Seleccionar artículo...</option>
+                <option value="">Select item...</option>
                 {articulos.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
               </select>
             </div>
             <div className="col-span-10 md:col-span-1">
-              <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Cantidad</label>
+              <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Qty</label>
               <input
                 type="number"
                 min={0.001}

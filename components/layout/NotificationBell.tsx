@@ -67,12 +67,12 @@ export function NotificationBell() {
             }}
           >
             <div className="px-4 py-3" style={{ borderBottom: '1px solid var(--border)' }}>
-              <h3 className="font-display font-semibold text-sm">Notificaciones</h3>
+              <h3 className="font-display font-semibold text-sm">Notifications</h3>
             </div>
             <div className="max-h-80 overflow-y-auto">
               {notifs.length === 0 ? (
                 <p className="px-4 py-6 text-center text-sm" style={{ color: 'var(--text-muted)' }}>
-                  Sin notificaciones
+                  No notifications
                 </p>
               ) : (
                 notifs.slice(0, 10).map((n) => (

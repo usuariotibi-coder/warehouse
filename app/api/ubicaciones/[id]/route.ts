@@ -7,7 +7,7 @@ import { Rol } from '@prisma/client'
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = UbicacionSchema.partial().safeParse(body)
@@ -20,14 +20,14 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const count = await prisma.articuloNivel.count({
     where: { nivel: { ubicacionId: params.id }, cantidad: { gt: 0 } },
   })
 
   if (count > 0) {
-    return errorResponse('No se puede eliminar una ubicación con artículos en sus niveles', 'UBICACION_CON_STOCK', 409)
+    return errorResponse('Cannot delete a location with items in its levels', 'UBICACION_CON_STOCK', 409)
   }
 
   await prisma.ubicacion.update({ where: { id: params.id }, data: { activa: false } })

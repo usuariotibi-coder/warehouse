@@ -13,7 +13,7 @@ export function UbicacionesBadge({ ubicaciones, maxVisible = 2 }: UbicacionesBad
   if (ubicaciones.length === 0) {
     return (
       <span style={{ color: 'var(--text-muted)', fontSize: 11, fontStyle: 'italic' }}>
-        Sin ubicación
+        No location
       </span>
     )
   }
@@ -54,7 +54,7 @@ export function UbicacionesBadge({ ubicaciones, maxVisible = 2 }: UbicacionesBad
               cursor: 'default',
             }}
           >
-            +{overflow.length} más
+            +{overflow.length} more
           </span>
           {showTooltip && (
             <div

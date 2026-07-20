@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx'
 export async function GET(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const formato = searchParams.get('formato') ?? 'excel'
@@ -22,16 +22,16 @@ export async function GET(req: Request) {
   })
 
   const rows = lotes.map((l) => ({
-    Artículo: l.articulo.nombre,
-    Marca: l.articulo.marca ?? '—',
-    Unidad: l.articulo.unidad,
+    Item: l.articulo.nombre,
+    Brand: l.articulo.marca ?? '—',
+    Unit: l.articulo.unidad,
     Stock: l.cantidadDisponible,
-    'Precio unitario': l.precioUnitario ?? 0,
-    'Valor total': (l.cantidadDisponible * (l.precioUnitario ?? 0)).toFixed(2),
+    'Unit price': l.precioUnitario ?? 0,
+    'Total value': (l.cantidadDisponible * (l.precioUnitario ?? 0)).toFixed(2),
   }))
 
   const totalValor = lotes.reduce((s, l) => s + l.cantidadDisponible * (l.precioUnitario ?? 0), 0)
-  rows.push({ Artículo: 'TOTAL', Marca: '', Unidad: '', Stock: 0, 'Precio unitario': 0, 'Valor total': totalValor.toFixed(2) })
+  rows.push({ Item: 'TOTAL', Brand: '', Unit: '', Stock: 0, 'Unit price': 0, 'Total value': totalValor.toFixed(2) })
 
   const wb = XLSX.utils.book_new()
   const ws = XLSX.utils.json_to_sheet(rows)

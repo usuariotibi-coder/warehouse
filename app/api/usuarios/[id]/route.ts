@@ -8,7 +8,7 @@ import bcrypt from 'bcryptjs'
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = UsuarioSchema.partial().safeParse(body)
@@ -33,7 +33,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   await prisma.usuario.update({ where: { id: params.id }, data: { activo: false } })
   return successResponse({ ok: true })

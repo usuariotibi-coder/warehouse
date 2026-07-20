@@ -6,7 +6,7 @@ import { Rol } from '@prisma/client'
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const entrada = await prisma.entrada.findUnique({
     where: { id: params.id },
@@ -15,7 +15,8 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
       proyecto: { select: { id: true, nombre: true } },
       lotes: {
         include: {
-          articulo: true,
+          articulo: { select: { id: true, nombre: true, unidad: true, marca: true, numeroParte: true } },
+          proveedor: { select: { id: true, nombre: true } },
           salidaItems: true,
           apartadoItems: true,
         },
@@ -23,6 +24,6 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     },
   })
 
-  if (!entrada) return errorResponse('Entrada no encontrada', 'NOT_FOUND', 404)
+  if (!entrada) return errorResponse('Entry not found', 'NOT_FOUND', 404)
   return successResponse(entrada)
 }

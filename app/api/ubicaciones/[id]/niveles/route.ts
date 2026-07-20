@@ -6,7 +6,7 @@ import { Rol } from '@prisma/client'
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const ultimo = await prisma.nivel.findFirst({
     where: { ubicacionId: params.id },

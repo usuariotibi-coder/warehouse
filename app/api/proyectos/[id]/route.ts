@@ -22,7 +22,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
     },
   })
 
-  if (!proyecto) return errorResponse('Proyecto no encontrado', 'NOT_FOUND', 404)
+  if (!proyecto) return errorResponse('Project not found', 'NOT_FOUND', 404)
 
   const costoTotal = proyecto.salidas.reduce((sum, s) => sum + (s.costoTotal ?? 0), 0)
   return successResponse({ ...proyecto, costoTotal })
@@ -31,7 +31,7 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = ProyectoSchema.partial().safeParse(body)
@@ -44,7 +44,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   await prisma.proyecto.update({ where: { id: params.id }, data: { estado: 'CERRADO' } })
   return successResponse({ ok: true })

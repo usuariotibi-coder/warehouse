@@ -55,8 +55,8 @@ export async function notificarAdminsEntradaSinPrecio(entradaId: string) {
     await enviarNotificacion({
       usuarioId: admin.id,
       tipo: 'ENTRADA_SIN_PRECIO',
-      titulo: 'Nueva entrada sin precio asignado',
-      mensaje: 'Se ha registrado una entrada que requiere asignación de precio.',
+      titulo: 'New entry without assigned price',
+      mensaje: 'An entry has been registered that requires price assignment.',
       metadata: { entradaId },
       canales: { inApp: true, email: true, telegram: true },
     })

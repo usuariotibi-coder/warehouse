@@ -44,7 +44,7 @@ export default function PerfilPage() {
     special: /[^A-Za-z0-9]/.test(pwNueva),
   }
   const strength = Object.values(rules).filter(Boolean).length
-  const strengthLabel = ['', 'Muy débil', 'Débil', 'Regular', 'Buena', 'Fuerte'][strength]
+  const strengthLabel = ['', 'Very weak', 'Weak', 'Fair', 'Good', 'Strong'][strength]
   const strengthColor = ['', '#ef4444', '#f97316', '#eab308', '#84cc16', '#22c55e'][strength]
 
   async function generarToken() {
@@ -116,26 +116,26 @@ export default function PerfilPage() {
               onClick={() => setPwModalOpen(true)}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-medium transition-colors flex-shrink-0"
               style={{ background: 'var(--bg-secondary)', color: 'var(--text-secondary)', border: '1px solid var(--border-subtle)' }}
-              title="Cambiar contraseña"
+              title="Change password"
             >
               <KeyRound size={13} />
-              Contraseña
+              Password
             </button>
           </div>
         </div>
       </div>
 
       {/* Modal cambiar contraseña */}
-      <Modal open={pwModalOpen} onClose={() => setPwModalOpen(false)} title="Cambiar contraseña" size="sm">
+      <Modal open={pwModalOpen} onClose={() => setPwModalOpen(false)} title="Change password" size="sm">
         <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-          Tu nueva contraseña debe cumplir todos los requisitos de seguridad.
+          Your new password must meet all security requirements.
         </p>
 
         <form onSubmit={cambiarPassword} className="space-y-4">
           {/* Contraseña actual */}
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
-              Contraseña actual
+              Current password
             </label>
             <div className="relative">
               <Input
@@ -159,7 +159,7 @@ export default function PerfilPage() {
           {/* Nueva contraseña */}
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
-              Nueva contraseña
+              New password
             </label>
             <div className="relative">
               <Input
@@ -198,11 +198,11 @@ export default function PerfilPage() {
                 </p>
               )}
               <div className="grid grid-cols-2 gap-x-4 gap-y-1 pt-1">
-                <RuleItem ok={rules.length} label="Mínimo 10 caracteres" />
-                <RuleItem ok={rules.upper} label="Una mayúscula" />
-                <RuleItem ok={rules.lower} label="Una minúscula" />
-                <RuleItem ok={rules.number} label="Un número" />
-                <RuleItem ok={rules.special} label="Un carácter especial" />
+                <RuleItem ok={rules.length} label="Minimum 10 characters" />
+                <RuleItem ok={rules.upper} label="One uppercase" />
+                <RuleItem ok={rules.lower} label="One lowercase" />
+                <RuleItem ok={rules.number} label="One number" />
+                <RuleItem ok={rules.special} label="One special character" />
               </div>
             </div>
           </div>
@@ -210,7 +210,7 @@ export default function PerfilPage() {
           {/* Confirmar contraseña */}
           <div>
             <label className="block text-sm font-medium mb-1" style={{ color: 'var(--text-secondary)' }}>
-              Confirmar nueva contraseña
+              Confirm new password
             </label>
             <div className="relative">
               <Input
@@ -231,44 +231,44 @@ export default function PerfilPage() {
             </div>
             {pwConfirmar.length > 0 && pwNueva !== pwConfirmar && (
               <p className="text-xs mt-1" style={{ color: '#ef4444' }}>
-                Las contraseñas no coinciden
+                Passwords do not match
               </p>
             )}
           </div>
 
           <Button type="submit" disabled={!canSubmit} className="w-full">
-            {pwLoading ? 'Actualizando...' : 'Actualizar contraseña'}
+            {pwLoading ? 'Updating...' : 'Update password'}
           </Button>
         </form>
       </Modal>
 
       {/* Telegram */}
       <div className="card-industrial p-5">
-        <h2 className="font-display text-lg font-semibold mb-2">Vinculación con Telegram</h2>
+        <h2 className="font-display text-lg font-semibold mb-2">Telegram linking</h2>
         <p className="text-sm mb-4" style={{ color: 'var(--text-secondary)' }}>
-          Vincula tu cuenta de Telegram para recibir notificaciones de inventario en tiempo real.
+          Link your Telegram account to receive real-time inventory notifications.
         </p>
 
         {paso === 'idle' ? (
-          <Button onClick={generarToken}>Vincular Telegram</Button>
+          <Button onClick={generarToken}>Link Telegram</Button>
         ) : (
           <div className="space-y-3">
             <div className="p-4 rounded-lg" style={{ background: 'var(--bg-tertiary)', border: '1px solid var(--accent-primary)' }}>
               <p className="text-xs mb-2" style={{ color: 'var(--text-muted)' }}>
-                1. Abre el bot en Telegram
+                1. Open the bot on Telegram
               </p>
               <p className="text-xs mb-3" style={{ color: 'var(--text-muted)' }}>
-                2. Envía este mensaje al bot:
+                2. Send this message to the bot:
               </p>
               <code className="block p-3 rounded font-mono-data text-sm"
                 style={{ background: 'var(--bg-primary)', color: 'var(--accent-primary)' }}>
                 /vincular {token}
               </code>
               <p className="text-xs mt-2" style={{ color: 'var(--text-muted)' }}>
-                El token expira en 10 minutos.
+                The token expires in 10 minutes.
               </p>
             </div>
-            <Button variant="ghost" onClick={() => setPaso('idle')}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setPaso('idle')}>Cancel</Button>
           </div>
         )}
       </div>

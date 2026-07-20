@@ -16,7 +16,7 @@ export async function POST(req: Request) {
   const { error, rol, userId } = await requireAuth()
   if (error) return error
   if (rol === Rol.USUARIO) return errorResponse(
-    'Solo el Almacenista o Admin pueden realizar movimientos',
+    'Only Storekeeper or Admin can perform movements',
     'ROL_INSUFICIENTE',
     403,
   )
@@ -28,7 +28,7 @@ export async function POST(req: Request) {
   const { articuloId, nivelOrigenId, nivelDestinoId, notas } = parsed.data
 
   if (nivelOrigenId === nivelDestinoId) return errorResponse(
-    'El nivel destino debe ser diferente al nivel origen',
+    'Destination level must be different from origin level',
     'MISMO_NIVEL',
   )
 
@@ -44,7 +44,7 @@ export async function POST(req: Request) {
   ])
 
   if (!articuloNivelOrigen || articuloNivelOrigen.cantidad === 0) return errorResponse(
-    'No hay existencia de este componente en el nivel seleccionado',
+    'No stock of this component in the selected level',
     'SIN_STOCK_EN_ORIGEN',
   )
 
@@ -129,8 +129,8 @@ export async function POST(req: Request) {
       data: {
         usuarioId: duenoId,
         tipo: 'MOVIMIENTO_COMPONENTE',
-        titulo: 'Componentes reubicados',
-        mensaje: `Los componentes que apartaste para ${item.apartado.proyecto?.nombre ?? 'sin proyecto'} fueron reubicados de ${nivelOrigenData?.ubicacion.nombre}-${nivelOrigenData?.nombre} a ${nivelDestinoData?.ubicacion.nombre}-${nivelDestinoData?.nombre} por ${usuario?.nombre}.`,
+        titulo: 'Components relocated',
+        mensaje: `The components you reserved for ${item.apartado.proyecto?.nombre ?? 'no project'} were moved from ${nivelOrigenData?.ubicacion.nombre}-${nivelOrigenData?.nombre} to ${nivelDestinoData?.ubicacion.nombre}-${nivelDestinoData?.nombre} by ${usuario?.nombre}.`,
         metadata: { apartadoId, movimientoId: movimientoId!, articuloId },
       },
     })

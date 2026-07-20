@@ -106,7 +106,7 @@ export default function ReportesPage() {
     if (movUsuarioId) params.set('usuarioId', movUsuarioId)
 
     const res = await fetch(`/api/reportes/movimientos?${params}`)
-    if (!res.ok) { toast.error('Error al exportar'); setMovExporting(false); return }
+    if (!res.ok) { toast.error('Error exporting'); setMovExporting(false); return }
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -121,7 +121,7 @@ export default function ReportesPage() {
     setLoading(formato)
     const params = new URLSearchParams({ formato, ...(desde && { desde }), ...(hasta && { hasta }) })
     const res = await fetch(`/api/reportes/${tipo}?${params}`)
-    if (!res.ok) { toast.error('Error al generar el reporte'); setLoading(null); return }
+    if (!res.ok) { toast.error('Error generating report'); setLoading(null); return }
     const blob = await res.blob()
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
@@ -139,10 +139,10 @@ export default function ReportesPage() {
   } as const
 
   const reportes: Array<{ id: TipoReporte; label: string; desc: string }> = [
-    { id: 'inventario', label: 'Valorización del inventario', desc: 'Stock actual con valorización FIFO por artículo y ubicación' },
-    { id: 'entradas', label: 'Reporte de entradas', desc: 'Historial de entradas con precios y proveedores' },
-    { id: 'salidas', label: 'Reporte de salidas', desc: 'Salidas por proyecto con costos FIFO' },
-    { id: 'movimientos', label: 'Movimientos de componentes', desc: 'Historial de reubicaciones entre niveles con filtros avanzados' },
+    { id: 'inventario', label: 'Inventory valuation', desc: 'Current stock with FIFO valuation per item and location' },
+    { id: 'entradas', label: 'Entry report', desc: 'Entry history with prices and suppliers' },
+    { id: 'salidas', label: 'Exit report', desc: 'Exits by project with FIFO costs' },
+    { id: 'movimientos', label: 'Component movements', desc: 'Relocation history between levels with advanced filters' },
   ]
 
   return (
@@ -171,16 +171,16 @@ export default function ReportesPage() {
         <div className="card-industrial p-4 max-w-2xl space-y-4">
           {tipo !== 'inventario' && (
             <div className="grid grid-cols-2 gap-4">
-              <Input label="Desde" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
-              <Input label="Hasta" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
+              <Input label="From" type="date" value={desde} onChange={(e) => setDesde(e.target.value)} />
+              <Input label="To" type="date" value={hasta} onChange={(e) => setHasta(e.target.value)} />
             </div>
           )}
           <div className="flex gap-3">
             <Button onClick={() => descargar('pdf')} loading={loading === 'pdf'} variant="secondary">
-              <FileText size={16} /> Exportar PDF
+              <FileText size={16} /> Export PDF
             </Button>
             <Button onClick={() => descargar('excel')} loading={loading === 'excel'}>
-              <FileSpreadsheet size={16} /> Exportar Excel
+              <FileSpreadsheet size={16} /> Export Excel
             </Button>
           </div>
         </div>
@@ -192,45 +192,45 @@ export default function ReportesPage() {
           {/* Filtros */}
           <div className="card-industrial p-4 space-y-3">
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-3">
-              <Input label="Desde" type="date" value={movDesde} onChange={(e) => setMovDesde(e.target.value)} />
-              <Input label="Hasta" type="date" value={movHasta} onChange={(e) => setMovHasta(e.target.value)} />
+              <Input label="From" type="date" value={movDesde} onChange={(e) => setMovDesde(e.target.value)} />
+              <Input label="To" type="date" value={movHasta} onChange={(e) => setMovHasta(e.target.value)} />
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Artículo</label>
+                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Item</label>
                 <select value={movArticuloId} onChange={(e) => setMovArticuloId(e.target.value)} style={selectStyle}>
-                  <option value="">Todos</option>
+                  <option value="">All</option>
                   {articulos.map(a => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Origen</label>
+                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Origin</label>
                 <select value={movUbicacionOrigenId} onChange={(e) => setMovUbicacionOrigenId(e.target.value)} style={selectStyle}>
-                  <option value="">Todas</option>
+                  <option value="">All</option>
                   {ubicaciones.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                 </select>
               </div>
               <div>
-                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Destino</label>
+                <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Destination</label>
                 <select value={movUbicacionDestinoId} onChange={(e) => setMovUbicacionDestinoId(e.target.value)} style={selectStyle}>
-                  <option value="">Todas</option>
+                  <option value="">All</option>
                   {ubicaciones.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                 </select>
               </div>
               {rol === 'ADMIN' && (
                 <div>
-                  <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>Usuario</label>
+                  <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-secondary)' }}>User</label>
                   <select value={movUsuarioId} onChange={(e) => setMovUsuarioId(e.target.value)} style={selectStyle}>
-                    <option value="">Todos</option>
+                    <option value="">All</option>
                     {usuarios.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                   </select>
                 </div>
               )}
             </div>
             <div className="flex gap-2">
-              <Button size="sm" onClick={() => fetchMovimientos(1)}>Buscar</Button>
+              <Button size="sm" onClick={() => fetchMovimientos(1)}>Search</Button>
               <Button size="sm" variant="ghost" onClick={() => {
                 setMovDesde(''); setMovHasta(''); setMovArticuloId('')
                 setMovUbicacionOrigenId(''); setMovUbicacionDestinoId(''); setMovUsuarioId('')
-              }}>Limpiar filtros</Button>
+              }}>Clear filters</Button>
               <div className="flex-1" />
               <Button size="sm" variant="secondary" onClick={exportarMovimientos} loading={movExporting}>
                 <FileSpreadsheet size={14} /> Excel
@@ -246,7 +246,7 @@ export default function ReportesPage() {
               <table className="w-full text-sm">
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                    {['Fecha', 'Artículo', 'Marca', 'Cantidad', 'Movimiento', 'Usuario', 'Notas'].map(h => (
+                    {['Date', 'Item', 'Brand', 'Qty', 'Movement', 'User', 'Notes'].map(h => (
                       <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider font-medium"
                         style={{ color: 'var(--text-muted)' }}>{h}</th>
                     ))}
@@ -289,7 +289,7 @@ export default function ReportesPage() {
               </table>
               {movData.length === 0 && (
                 <p className="text-center py-12 text-sm" style={{ color: 'var(--text-muted)' }}>
-                  No hay movimientos en el período seleccionado
+                  No movements in the selected period
                 </p>
               )}
             </div>
@@ -299,7 +299,7 @@ export default function ReportesPage() {
           {movTotalPages > 1 && (
             <div className="flex items-center justify-between">
               <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                Mostrando {((movPage - 1) * 50) + 1}–{Math.min(movPage * 50, movTotal)} de {movTotal} movimientos
+                Showing {((movPage - 1) * 50) + 1}–{Math.min(movPage * 50, movTotal)} of {movTotal} movements
               </p>
               <div className="flex gap-2">
                 <Button variant="ghost" size="sm" onClick={() => fetchMovimientos(movPage - 1)} disabled={movPage === 1}>

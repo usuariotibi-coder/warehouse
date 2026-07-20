@@ -22,7 +22,8 @@ interface Entrada {
     cantidadDisponible: number
     precioUnitario?: number | null
     precioPendiente: boolean
-    articulo: { nombre: string; unidad: string }
+    articulo: { nombre: string; unidad: string; marca?: string | null; numeroParte?: string | null }
+    proveedor?: { nombre: string } | null
   }>
 }
 
@@ -106,7 +107,13 @@ export default function EntradaDetailPage() {
               <div>
                 <p className="text-sm font-medium">{lote.articulo.nombre}</p>
                 <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                  {lote.cantidadDisponible} / {lote.cantidadOriginal} {lote.articulo.unidad} disponibles
+                  {lote.cantidadDisponible} / {lote.cantidadOriginal} {lote.articulo.unidad} available
+                  {(lote.articulo.marca || lote.articulo.numeroParte) && (
+                    <span> · {[lote.articulo.marca, lote.articulo.numeroParte ? `#${lote.articulo.numeroParte}` : ''].filter(Boolean).join(' / ')}</span>
+                  )}
+                  {lote.proveedor && (
+                    <span> · Supplier: <span style={{ color: 'var(--accent-primary)' }}>{lote.proveedor.nombre}</span></span>
+                  )}
                 </p>
               </div>
               <div className="text-right">

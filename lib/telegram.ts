@@ -41,7 +41,7 @@ export async function procesarComandoTelegram(msg: TelegramBot.Message) {
     })
 
     if (!registro?.usuarioId) {
-      await b.sendMessage(chatId, '❌ Token inválido o expirado.')
+      await b.sendMessage(chatId, '❌ Invalid or expired token.')
       return
     }
 
@@ -53,8 +53,8 @@ export async function procesarComandoTelegram(msg: TelegramBot.Message) {
       },
     })
 
-    await b.sendMessage(chatId, `✅ Cuenta vinculada correctamente a <b>${usuario.nombre}</b>.`, { parse_mode: 'HTML' })
+    await b.sendMessage(chatId, `✅ Account successfully linked to <b>${usuario.nombre}</b>.`, { parse_mode: 'HTML' })
   } else if (text === '/start') {
-    await b.sendMessage(chatId, '👋 Bienvenido a <b>InventaPro Bot</b>.\n\nPara vincular tu cuenta, ve a tu perfil en la app y sigue las instrucciones.', { parse_mode: 'HTML' })
+    await b.sendMessage(chatId, '👋 Welcome to <b>InventaPro Bot</b>.\n\nTo link your account, go to your profile in the app and follow the instructions.', { parse_mode: 'HTML' })
   }
 }

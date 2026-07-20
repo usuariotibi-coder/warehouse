@@ -19,9 +19,6 @@ export async function GET() {
       where: { activa: true },
       orderBy: { nombre: 'asc' },
       include: {
-        articuloUbicaciones: {
-          include: { articulo: { select: { id: true, nombre: true, fotoUrl: true } } },
-        },
         niveles: {
           where: { activo: true },
           orderBy: { numero: 'asc' },
@@ -71,7 +68,7 @@ export async function GET() {
 export async function POST(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = UbicacionCreateSchema.safeParse(body)

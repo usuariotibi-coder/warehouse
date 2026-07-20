@@ -6,15 +6,17 @@ import { Button } from '@/components/ui/Button'
 import { toast } from 'sonner'
 import { Plus, Trash2 } from 'lucide-react'
 
-interface Articulo { id: string; nombre: string; unidad: string }
+interface Articulo { id: string; nombre: string; unidad: string; marca?: string | null; numeroParte?: string | null }
 interface Nivel { id: string; nombre: string; numero: number }
 interface Ubicacion { id: string; nombre: string; niveles: Nivel[] }
 interface Proyecto { id: string; nombre: string }
+interface Proveedor { id: string; nombre: string }
 
 interface LoteItem {
   articuloId: string
   ubicacionId: string
   nivelId: string
+  proveedorId: string
   cantidadOriginal: number
 }
 
@@ -24,13 +26,16 @@ const selectStyle = {
   color: 'var(--text-primary)',
 } as const
 
+const infoTextStyle = { color: 'var(--text-muted)', fontSize: '0.7rem' } as const
+
 export default function NuevaEntradaPage() {
   const router = useRouter()
   const [articulos, setArticulos] = useState<Articulo[]>([])
   const [ubicaciones, setUbicaciones] = useState<Ubicacion[]>([])
   const [proyectos, setProyectos] = useState<Proyecto[]>([])
+  const [proveedores, setProveedores] = useState<Proveedor[]>([])
   const [proyectoId, setProyectoId] = useState('')
-  const [lotes, setLotes] = useState<LoteItem[]>([{ articuloId: '', ubicacionId: '', nivelId: '', cantidadOriginal: 1 }])
+  const [lotes, setLotes] = useState<LoteItem[]>([{ articuloId: '', ubicacionId: '', nivelId: '', proveedorId: '', cantidadOriginal: 1 }])
   const [saving, setSaving] = useState(false)
 
   useEffect(() => {
@@ -38,10 +43,12 @@ export default function NuevaEntradaPage() {
       fetch('/api/articulos?limit=200').then((r) => r.json()),
       fetch('/api/ubicaciones').then((r) => r.json()),
       fetch('/api/proyectos').then((r) => r.json()),
-    ]).then(([a, u, p]) => {
+      fetch('/api/proveedores').then((r) => r.json()),
+    ]).then(([a, u, p, prov]) => {
       setArticulos(a.articulos ?? [])
       setUbicaciones(u)
       setProyectos((Array.isArray(p) ? p : []).filter((pr: any) => pr.estado === 'ACTIVO'))
+      setProveedores(Array.isArray(prov) ? prov : [])
     })
   }, [])
 
@@ -49,8 +56,12 @@ export default function NuevaEntradaPage() {
     return ubicaciones.find(u => u.id === ubicacionId)?.niveles ?? []
   }
 
+  function articuloSeleccionado(articuloId: string): Articulo | undefined {
+    return articulos.find(a => a.id === articuloId)
+  }
+
   function addLote() {
-    setLotes(l => [...l, { articuloId: '', ubicacionId: '', nivelId: '', cantidadOriginal: 1 }])
+    setLotes(l => [...l, { articuloId: '', ubicacionId: '', nivelId: '', proveedorId: '', cantidadOriginal: 1 }])
   }
 
   function removeLote(i: number) {
@@ -68,7 +79,7 @@ export default function NuevaEntradaPage() {
 
   async function submit() {
     if (lotes.some(l => !l.articuloId || l.cantidadOriginal < 1)) {
-      toast.error('Completa todos los artículos y cantidades')
+      toast.error('Complete all items and quantities')
       return
     }
     setSaving(true)
@@ -78,6 +89,7 @@ export default function NuevaEntradaPage() {
         articuloId: l.articuloId,
         ubicacionId: l.ubicacionId || undefined,
         nivelId: l.nivelId || undefined,
+        proveedorId: l.proveedorId || undefined,
         cantidadOriginal: l.cantidadOriginal,
       })),
     }
@@ -88,7 +100,7 @@ export default function NuevaEntradaPage() {
     })
     if (res.ok) {
       const data = await res.json()
-      toast.success('Entrada registrada correctamente')
+      toast.success('Entry registered successfully')
       router.push(`/entradas/${data.id}`)
     } else {
       const err = await res.json()
@@ -102,10 +114,10 @@ export default function NuevaEntradaPage() {
       {/* Proyecto */}
       <div className="card-industrial p-5">
         <div className="flex items-center gap-6">
-          <h2 className="font-display text-lg font-semibold whitespace-nowrap">Datos generales</h2>
+          <h2 className="font-display text-lg font-semibold whitespace-nowrap">General data</h2>
           <div className="flex-1">
             <label className="block text-xs uppercase tracking-wider mb-1.5" style={{ color: 'var(--text-muted)' }}>
-              Proyecto
+              Project
             </label>
             <select
               value={proyectoId}
@@ -113,7 +125,7 @@ export default function NuevaEntradaPage() {
               className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
               style={selectStyle}
             >
-              <option value="">Sin proyecto</option>
+              <option value="">No project</option>
               {proyectos.map((p) => (
                 <option key={p.id} value={p.id}>{p.nombre}</option>
               ))}
@@ -125,17 +137,18 @@ export default function NuevaEntradaPage() {
       {/* Artículos */}
       <div className="card-industrial p-5 space-y-3">
         <div className="flex items-center justify-between">
-          <h2 className="font-display text-lg font-semibold">Artículos</h2>
-          <Button variant="outline" size="sm" onClick={addLote}><Plus size={14} /> Agregar</Button>
+          <h2 className="font-display text-lg font-semibold">Items</h2>
+          <Button variant="outline" size="sm" onClick={addLote}><Plus size={14} /> Add</Button>
         </div>
 
         {/* Header row — hidden on mobile */}
         <div className="hidden md:grid grid-cols-12 gap-3 px-3 pb-1">
           {[
-            { label: 'Artículo', span: 'col-span-5' },
-            { label: 'Ubicación', span: 'col-span-3' },
-            { label: 'Nivel', span: 'col-span-2' },
-            { label: 'Cant.', span: 'col-span-1' },
+            { label: 'Item', span: 'col-span-4' },
+            { label: 'Location', span: 'col-span-2' },
+            { label: 'Level', span: 'col-span-2' },
+            { label: 'Supplier', span: 'col-span-2' },
+            { label: 'Qty', span: 'col-span-1' },
             { label: '', span: 'col-span-1' },
           ].map(({ label, span }) => (
             <div key={label} className={`${span} text-xs uppercase tracking-wider`} style={{ color: 'var(--text-muted)' }}>
@@ -146,42 +159,49 @@ export default function NuevaEntradaPage() {
 
         {lotes.map((lote, i) => {
           const niveles = nivelesDeUbicacion(lote.ubicacionId)
+          const art = articuloSeleccionado(lote.articuloId)
           return (
             <div key={i}
-              className="grid grid-cols-12 gap-3 items-center p-3 rounded-lg"
+              className="grid grid-cols-12 gap-3 items-start p-3 rounded-lg"
               style={{ background: 'var(--bg-tertiary)' }}
             >
-              {/* Artículo */}
-              <div className="col-span-12 md:col-span-5">
-                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Artículo</label>
+              {/* Artículo + info */}
+              <div className="col-span-12 md:col-span-4">
+                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Item</label>
                 <select
                   value={lote.articuloId}
                   onChange={(e) => updateLote(i, 'articuloId', e.target.value)}
                   className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
                   style={selectStyle}
                 >
-                  <option value="">Seleccionar artículo...</option>
+                  <option value="">Select item...</option>
                   {articulos.map((a) => <option key={a.id} value={a.id}>{a.nombre}</option>)}
                 </select>
+                {art && (
+                  <div className="mt-0.5 flex flex-wrap gap-x-3">
+                    {art.marca && <span style={infoTextStyle}>Marca: {art.marca}</span>}
+                    {art.numeroParte && <span style={infoTextStyle}>#Parte: {art.numeroParte}</span>}
+                  </div>
+                )}
               </div>
 
-              {/* Ubicación */}
-              <div className="col-span-6 md:col-span-3">
-                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Ubicación</label>
+              {/* Location */}
+              <div className="col-span-6 md:col-span-2">
+                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Location</label>
                 <select
                   value={lote.ubicacionId}
                   onChange={(e) => updateLote(i, 'ubicacionId', e.target.value)}
                   className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
                   style={selectStyle}
                 >
-                  <option value="">Sin ubicación</option>
+                  <option value="">No location</option>
                   {ubicaciones.map((u) => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                 </select>
               </div>
 
-              {/* Nivel */}
+              {/* Level */}
               <div className="col-span-3 md:col-span-2">
-                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Nivel</label>
+                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Level</label>
                 <select
                   value={lote.nivelId}
                   onChange={(e) => updateLote(i, 'nivelId', e.target.value)}
@@ -196,9 +216,25 @@ export default function NuevaEntradaPage() {
                 </select>
               </div>
 
-              {/* Cantidad */}
+              {/* Supplier */}
+              <div className="col-span-3 md:col-span-2">
+                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Supplier</label>
+                <select
+                  value={lote.proveedorId}
+                  onChange={(e) => updateLote(i, 'proveedorId', e.target.value)}
+                  className="w-full px-3 py-2.5 rounded-md text-sm outline-none border"
+                  style={selectStyle}
+                >
+                  <option value="">No supplier</option>
+                  {proveedores.map((p) => (
+                    <option key={p.id} value={p.id}>{p.nombre}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* Quantity */}
               <div className="col-span-2 md:col-span-1">
-                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Cant.</label>
+                <label className="md:hidden block text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Qty</label>
                 <input
                   type="number"
                   min={0.001}

@@ -9,7 +9,7 @@ import * as XLSX from 'xlsx'
 export async function GET(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const formato = searchParams.get('formato')
@@ -50,14 +50,14 @@ export async function GET(req: Request) {
     })
 
     const rows = movimientos.map(m => ({
-      Fecha: new Date(m.createdAt).toLocaleString('es-MX'),
-      Artículo: m.articulo.nombre,
-      Marca: m.articulo.marca ?? '—',
-      Cantidad: m.cantidadMovida,
-      Origen: `${m.nivelOrigen.ubicacion.nombre}-${m.nivelOrigen.nombre}`,
-      Destino: `${m.nivelDestino.ubicacion.nombre}-${m.nivelDestino.nombre}`,
-      Usuario: m.usuario.nombre,
-      Notas: m.notas ?? '',
+      Date: new Date(m.createdAt).toLocaleString('en-US'),
+      Item: m.articulo.nombre,
+      Brand: m.articulo.marca ?? '—',
+      Quantity: m.cantidadMovida,
+      Origin: `${m.nivelOrigen.ubicacion.nombre}-${m.nivelOrigen.nombre}`,
+      Destination: `${m.nivelDestino.ubicacion.nombre}-${m.nivelDestino.nombre}`,
+      User: m.usuario.nombre,
+      Notes: m.notas ?? '',
     }))
 
     const wb = XLSX.utils.book_new()

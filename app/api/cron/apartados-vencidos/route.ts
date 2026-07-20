@@ -16,8 +16,8 @@ export async function POST() {
     await enviarNotificacion({
       usuarioId: apartado.usuarioId,
       tipo: 'APARTADO_VENCIMIENTO',
-      titulo: 'Tu apartado ha vencido',
-      mensaje: 'Los artículos apartados quedaron disponibles para otros usuarios.',
+      titulo: 'Your reserve has expired',
+      mensaje: 'The reserved items are now available for other users.',
       metadata: { apartadoId: apartado.id },
       canales: { inApp: true, email: true, telegram: true },
     })

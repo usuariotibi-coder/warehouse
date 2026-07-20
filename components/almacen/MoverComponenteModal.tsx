@@ -79,52 +79,52 @@ export function MoverComponenteModal({
   } as const
 
   return (
-    <Modal open={isOpen} onClose={onClose} title="Mover componente" size="sm">
+      <Modal open={isOpen} onClose={onClose} title="Move component" size="sm">
       <div className="space-y-5">
         {/* Info artículo */}
         <div className="grid grid-cols-2 gap-x-6 gap-y-2">
-          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Componente</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Component</span>
           <span style={{ color: 'var(--text-primary)', fontSize: 14 }}>
             {articulo.nombre}
             {articulo.marca && <span style={{ color: 'var(--text-muted)' }}> · {articulo.marca}</span>}
           </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Origen</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Origin</span>
           <span style={{ color: 'var(--text-primary)', fontSize: 14 }}>
             {nivelOrigen.ubicacion.nombre} — {nivelOrigen.nombre}
           </span>
-          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Cantidad</span>
+          <span style={{ color: 'var(--text-muted)', fontSize: 12 }}>Quantity</span>
           <span style={{ color: 'var(--accent-primary)', fontSize: 14, fontWeight: 700 }}>
-            {cantidadTotal} pzas
+            {cantidadTotal} pcs
           </span>
         </div>
 
         {/* Destino */}
         <div style={{ border: '1px solid var(--border)', borderRadius: 8, padding: 16 }}>
-          <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>Destino</p>
+          <p className="text-xs uppercase tracking-wider mb-3" style={{ color: 'var(--text-muted)' }}>Destination</p>
           <div className="space-y-3">
             <div>
-              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Ubicación</label>
+              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Location</label>
               <select
                 value={destUbicacionId}
                 onChange={(e) => { setDestUbicacionId(e.target.value); setDestNivelId('') }}
                 style={inputStyle}
               >
-                <option value="">Seleccionar ubicación...</option>
+                <option value="">Select location...</option>
                 {ubicaciones.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
               </select>
             </div>
             <div>
-              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Nivel</label>
+              <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Level</label>
               <select
                 value={destNivelId}
                 onChange={(e) => setDestNivelId(e.target.value)}
                 disabled={!destUbicacionId}
                 style={{ ...inputStyle, opacity: !destUbicacionId ? 0.5 : 1 }}
               >
-                <option value="">Seleccionar nivel...</option>
+                <option value="">Select level...</option>
                 {nivelesDestino.map(n => (
                   <option key={n.id} value={n.id} disabled={n.id === nivelOrigen.id}>
-                    {n.nombre}{n.id === nivelOrigen.id ? ' (actual)' : ''}
+                    {n.nombre}{n.id === nivelOrigen.id ? ' (current)' : ''}
                   </option>
                 ))}
               </select>
@@ -145,21 +145,21 @@ export function MoverComponenteModal({
           }}>
             <AlertTriangle size={16} style={{ color: 'var(--accent-warning)', flexShrink: 0, marginTop: 1 }} />
             <p style={{ color: 'var(--text-secondary)', fontSize: 13, lineHeight: 1.5 }}>
-              Este componente tiene <strong style={{ color: 'var(--accent-warning)' }}>{cantidadApartada} unidades apartadas</strong>.
-              Serán reubicadas automáticamente y se notificará a los usuarios correspondientes.
+              This component has <strong style={{ color: 'var(--accent-warning)' }}>{cantidadApartada} reserved units</strong>.
+              They will be relocated automatically and the corresponding users will be notified.
             </p>
           </div>
         )}
 
         {/* Notas */}
         <div>
-          <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Notas (opcional)</label>
+          <label className="block text-xs mb-1.5" style={{ color: 'var(--text-secondary)' }}>Notes (optional)</label>
           <textarea
             value={notas}
             onChange={(e) => setNotas(e.target.value)}
             rows={2}
             style={{ ...inputStyle, resize: 'none' }}
-            placeholder="Observaciones del movimiento..."
+            placeholder="Movement notes..."
           />
         </div>
 
@@ -168,9 +168,9 @@ export function MoverComponenteModal({
         )}
 
         <div className="flex gap-3 justify-end">
-          <Button variant="ghost" onClick={onClose} disabled={saving}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose} disabled={saving}>Cancel</Button>
           <Button onClick={confirmar} loading={saving} disabled={!canConfirm}>
-            Confirmar movimiento →
+            Confirm move →
           </Button>
         </div>
       </div>

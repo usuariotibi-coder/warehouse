@@ -14,14 +14,14 @@ export async function enviarEmailEntradaSinPrecio(to: string, entradaId: string)
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: '[InventaPro] Nueva entrada requiere asignación de precio',
+    subject: '[InventaPro] New entry requires price assignment',
     html: `
       <div style="font-family:sans-serif;background:#0A0C0F;color:#E8EAED;padding:32px">
         <h1 style="color:#00D4FF">InventaPro</h1>
-        <p>Se ha registrado una nueva entrada al almacén que requiere asignación de precio.</p>
+        <p>A new warehouse entry has been registered that requires price assignment.</p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/entradas/${entradaId}"
            style="display:inline-block;background:#00D4FF;color:#0A0C0F;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">
-          Asignar precio →
+          Assign price →
         </a>
       </div>
     `,
@@ -34,15 +34,15 @@ export async function enviarEmailApartadoVencimiento(to: string, apartadoId: str
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: '[InventaPro] Tu apartado está próximo a vencer',
+    subject: '[InventaPro] Your reserve is about to expire',
     html: `
       <div style="font-family:sans-serif;background:#0A0C0F;color:#E8EAED;padding:32px">
         <h1 style="color:#00D4FF">InventaPro</h1>
         <p>Tu apartado vence el <strong>${fechaExpira.toLocaleDateString('es-MX')}</strong>.</p>
-        <p>Procesa la salida antes del vencimiento para no perder la reserva.</p>
+        <p>Process the exit before expiration to avoid losing the reserve.</p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/apartados"
            style="display:inline-block;background:#FFB300;color:#0A0C0F;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">
-          Ver apartado →
+          View reserve →
         </a>
       </div>
     `,
@@ -55,16 +55,16 @@ export async function enviarEmailBienvenida(to: string, nombre: string, password
   await resend.emails.send({
     from: FROM_EMAIL,
     to,
-    subject: '[InventaPro] Bienvenido — tus credenciales de acceso',
+    subject: '[InventaPro] Welcome — your access credentials',
     html: `
       <div style="font-family:sans-serif;background:#0A0C0F;color:#E8EAED;padding:32px">
         <h1 style="color:#00D4FF">InventaPro</h1>
         <p>Hola <strong>${nombre}</strong>, tu cuenta ha sido creada.</p>
         <p>Email: <code>${to}</code></p>
-        <p>Contraseña temporal: <code>${password}</code></p>
+        <p>Temporary password: <code>${password}</code></p>
         <a href="${process.env.NEXT_PUBLIC_APP_URL}/login"
            style="display:inline-block;background:#00D4FF;color:#0A0C0F;padding:12px 24px;border-radius:6px;text-decoration:none;font-weight:bold">
-          Iniciar sesión →
+          Sign in →
         </a>
       </div>
     `,

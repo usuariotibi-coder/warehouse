@@ -16,13 +16,13 @@ const barlow = Barlow_Semi_Condensed({
 const antiFlashScript = `(function(){try{var s=localStorage.getItem('inventapro-theme');var d=window.matchMedia('(prefers-color-scheme: dark)').matches;var t=s||(d?'dark':'light');if(t==='dark')document.documentElement.classList.add('dark');}catch(e){}})()`
 
 export const metadata: Metadata = {
-  title: 'InventaPro — Control de Inventario',
-  description: 'Sistema profesional de control de inventario para almacenes',
+  title: 'InventaPro — Inventory Control',
+  description: 'Professional inventory control system for warehouses',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es" suppressHydrationWarning className={barlow.variable}>
+    <html lang="en" suppressHydrationWarning className={barlow.variable}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: antiFlashScript }} />
       </head>

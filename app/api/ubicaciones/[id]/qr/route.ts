@@ -7,10 +7,10 @@ import { uploadImage } from '@/lib/cloudinary'
 export async function GET(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === 'USUARIO') return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === 'USUARIO') return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const ubicacion = await prisma.ubicacion.findUnique({ where: { id: params.id } })
-  if (!ubicacion) return errorResponse('Ubicación no encontrada', 'NOT_FOUND', 404)
+  if (!ubicacion) return errorResponse('Location not found', 'NOT_FOUND', 404)
 
   if (ubicacion.qrCode) {
     return Response.json({ qrUrl: ubicacion.qrCode })

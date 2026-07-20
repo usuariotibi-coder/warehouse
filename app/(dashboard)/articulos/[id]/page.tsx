@@ -52,7 +52,7 @@ export default function ArticuloDetailPage() {
   }, [id])
 
   if (loading) return <div className="space-y-4"><SkeletonCard /><SkeletonCard /></div>
-  if (!articulo) return <p style={{ color: 'var(--text-muted)' }}>Artículo no encontrado</p>
+  if (!articulo) return <p style={{ color: 'var(--text-muted)' }}>Item not found</p>
 
   const stockTotal = articulo.lotesEntrada.reduce((s, l) => s + l.cantidadDisponible, 0)
   const reservado = articulo.apartadoReservado ?? 0
@@ -79,13 +79,13 @@ export default function ArticuloDetailPage() {
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Stock disponible</p>
+            <p className="text-xs uppercase tracking-wider" style={{ color: 'var(--text-muted)' }}>Available stock</p>
             <p className="font-mono-data text-3xl font-bold" style={{ color: 'var(--accent-primary)' }}>
               {stockDisponible}
             </p>
             {reservado > 0 && (
               <p className="text-xs" style={{ color: 'var(--accent-warning)' }}>
-                {reservado} apartado · {stockTotal} total
+                {reservado} reserved · {stockTotal} total
               </p>
             )}
             <p className="text-xs" style={{ color: 'var(--text-muted)' }}>{articulo.unidad}</p>
@@ -97,7 +97,7 @@ export default function ArticuloDetailPage() {
       <div>
         <h3 className="font-display font-semibold text-sm uppercase tracking-widest mb-3"
           style={{ color: 'var(--text-muted)' }}>
-          Lotes FIFO (más antiguo → más nuevo)
+          FIFO Lots (oldest → newest)
         </h3>
         <div className="space-y-2">
           {articulo.lotesEntrada.map((lote, i) => (
@@ -120,7 +120,7 @@ export default function ArticuloDetailPage() {
                     </Badge>
                   </div>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    Por {lote.entrada.usuario.nombre}
+                    By {lote.entrada.usuario.nombre}
                   </p>
                 </div>
                 <div className="text-right">
@@ -128,7 +128,7 @@ export default function ArticuloDetailPage() {
                     {lote.cantidadDisponible}
                   </p>
                   <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
-                    / {lote.cantidadOriginal} originales
+                    / {lote.cantidadOriginal} original
                   </p>
                 </div>
               </div>
@@ -141,7 +141,7 @@ export default function ArticuloDetailPage() {
         <div>
           <h3 className="font-display font-semibold text-sm uppercase tracking-widest mb-3"
             style={{ color: 'var(--text-muted)' }}>
-            Historial de movimientos
+            Movement history
           </h3>
           <div className="space-y-2">
             {articulo.movimientos.map((mov, i) => (
@@ -164,7 +164,7 @@ export default function ArticuloDetailPage() {
                       {mov.nivelDestino.ubicacion.nombre}-{mov.nivelDestino.nombre}
                     </p>
                     <p className="text-xs mt-0.5" style={{ color: 'var(--text-muted)' }}>
-                      Por {mov.usuario.nombre}{mov.notas && ` · ${mov.notas}`}
+                      By {mov.usuario.nombre}{mov.notas && ` · ${mov.notas}`}
                     </p>
                   </div>
                   <div className="text-right">

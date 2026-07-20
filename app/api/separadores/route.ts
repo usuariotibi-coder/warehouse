@@ -17,13 +17,13 @@ export async function GET() {
 export async function PUT(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const { prefix, tipo } = body
 
-  if (!prefix || typeof prefix !== 'string') return errorResponse('prefix requerido', 'VALIDATION_ERROR')
-  if (!TIPOS_VALIDOS.includes(tipo)) return errorResponse('tipo inválido', 'VALIDATION_ERROR')
+  if (!prefix || typeof prefix !== 'string') return errorResponse('prefix required', 'VALIDATION_ERROR')
+  if (!TIPOS_VALIDOS.includes(tipo)) return errorResponse('Invalid tipo', 'VALIDATION_ERROR')
 
   const separador = await prisma.separadorFila.upsert({
     where: { prefix },

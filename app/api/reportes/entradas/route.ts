@@ -8,7 +8,7 @@ import * as XLSX from 'xlsx'
 export async function GET(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const { searchParams } = new URL(req.url)
   const desde = searchParams.get('desde')
@@ -32,14 +32,14 @@ export async function GET(req: Request) {
 
   const rows = entradas.flatMap((e) =>
     e.lotes.map((l) => ({
-      Fecha: e.fecha.toISOString().split('T')[0],
-      Artículo: l.articulo.nombre,
-      Marca: l.articulo.marca ?? '—',
-      Cantidad: l.cantidadOriginal,
-      Unidad: l.articulo.unidad,
-      'Precio unitario': l.precioUnitario ?? 'Sin precio',
-      'Total lote': l.precioUnitario ? (l.cantidadOriginal * l.precioUnitario).toFixed(2) : '—',
-      Almacenista: e.usuario.nombre,
+      Date: e.fecha.toISOString().split('T')[0],
+      Item: l.articulo.nombre,
+      Brand: l.articulo.marca ?? '—',
+      Quantity: l.cantidadOriginal,
+      Unit: l.articulo.unidad,
+      'Unit price': l.precioUnitario ?? 'No price',
+      'Lot total': l.precioUnitario ? (l.cantidadOriginal * l.precioUnitario).toFixed(2) : '—',
+      Storekeeper: e.usuario.nombre,
     }))
   )
 

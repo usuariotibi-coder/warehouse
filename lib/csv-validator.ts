@@ -11,6 +11,7 @@ export interface CSVRowValidated {
     nivelId?: string
     ubicacionId?: string
     proyectoId?: string
+    proveedorId?: string
     cantidad?: number
   }
   ubicacionSugerida?: {
@@ -57,19 +58,21 @@ export async function validarCSV(
   rows: Record<string, string>[],
   tipo: TipoCSV
 ): Promise<CSVRowValidated[]> {
-  const [articulos, ubicaciones, proyectos] = await Promise.all([
+  const [articulos, ubicaciones, proyectos, proveedores] = await Promise.all([
     prisma.articulo.findMany({ where: { activo: true }, select: { id: true, nombre: true, marca: true, numeroParte: true } }),
     prisma.ubicacion.findMany({
       where: { activa: true },
       include: { niveles: { where: { activo: true }, orderBy: { numero: 'asc' } } },
     }),
     prisma.proyecto.findMany({ where: { estado: 'ACTIVO' }, select: { id: true, nombre: true } }),
+    prisma.proveedor.findMany({ where: { activo: true }, select: { id: true, nombre: true } }),
   ])
 
   const articuloMap = new Map(articulos.map(a => [a.nombre.toLowerCase(), a]))
   const articuloByNumeroParte = new Map(articulos.filter(a => a.numeroParte).map(a => [a.numeroParte!.toLowerCase(), a]))
   const ubicacionMap = new Map(ubicaciones.map(u => [u.nombre.toLowerCase(), u]))
   const proyectoMap = new Map(proyectos.map(p => [p.nombre.toLowerCase(), p]))
+  const proveedorMap = new Map(proveedores.map(p => [p.nombre.toLowerCase(), p]))
 
   const results: CSVRowValidated[] = []
 
@@ -87,7 +90,7 @@ export async function validarCSV(
     const cantidadStr = row['cantidad'] ?? ''
 
     if (!artNombre && !artNumeroParte) {
-      errors.push('Se requiere articulo_nombre o numero_parte')
+      errors.push('articulo_nombre or numero_parte is required')
     } else {
       let articulo = artNumeroParte
         ? articuloByNumeroParte.get(artNumeroParte.toLowerCase())
@@ -98,14 +101,14 @@ export async function validarCSV(
       if (articulo) {
         resolvedData.articuloId = articulo.id
         if (artMarca && articulo.marca && articulo.marca.toLowerCase() !== artMarca.toLowerCase()) {
-          warnings.push(`Marca "${artMarca}" no coincide con la registrada ("${articulo.marca}")`)
+          warnings.push(`Brand "${artMarca}" does not match registered ("${articulo.marca}")`)
         }
       }
     }
 
     const cantidad = parseFloat(cantidadStr)
     if (!cantidadStr || isNaN(cantidad) || cantidad <= 0) {
-      errors.push('cantidad debe ser un número positivo')
+      errors.push('quantity must be a positive number')
     } else {
       resolvedData.cantidad = cantidad
     }
@@ -115,23 +118,33 @@ export async function validarCSV(
       const nivNombre = row['nivel'] ?? ''
 
       if (!ubNombre) {
-        warnings.push('No se especificó ubicación')
+        warnings.push('No location specified')
       } else {
         const ub = ubicacionMap.get(ubNombre.toLowerCase())
         if (!ub) {
-          errors.push(`Ubicación "${ubNombre}" no existe`)
+            errors.push(`Location "${ubNombre}" does not exist`)
         } else {
           resolvedData.ubicacionId = ub.id
           if (nivNombre) {
             const nivel = ub.niveles.find(n => n.nombre.toLowerCase() === nivNombre.toLowerCase())
             if (!nivel) {
-              errors.push(`Nivel "${nivNombre}" no existe en ubicación "${ubNombre}"`)
+              errors.push(`Level "${nivNombre}" does not exist in location "${ubNombre}"`)
             } else {
               resolvedData.nivelId = nivel.id
             }
           } else {
-            warnings.push('No se especificó nivel')
+            warnings.push('No level specified')
           }
+        }
+      }
+
+      const proveedorNombre = row['proveedor_nombre'] ?? ''
+      if (proveedorNombre) {
+        const prov = proveedorMap.get(proveedorNombre.toLowerCase())
+        if (prov) {
+          resolvedData.proveedorId = prov.id
+        } else {
+          warnings.push(`Supplier "${proveedorNombre}" not registered — will be created on processing`)
         }
       }
 
@@ -142,7 +155,7 @@ export async function validarCSV(
       if (proyNombre) {
         const proyecto = proyectoMap.get(proyNombre.toLowerCase())
         if (!proyecto) {
-          errors.push(`Proyecto "${proyNombre}" no existe o no está activo`)
+          errors.push(`Project "${proyNombre}" does not exist or is not active`)
         } else {
           resolvedData.proyectoId = proyecto.id
         }
@@ -155,7 +168,7 @@ export async function validarCSV(
         })
         const stockDisponible = stock._sum.cantidad ?? 0
         if (stockDisponible < resolvedData.cantidad) {
-          errors.push(`Stock insuficiente: disponible ${stockDisponible}, solicitado ${resolvedData.cantidad}`)
+          errors.push(`Insufficient stock: available ${stockDisponible}, requested ${resolvedData.cantidad}`)
         }
       }
     }

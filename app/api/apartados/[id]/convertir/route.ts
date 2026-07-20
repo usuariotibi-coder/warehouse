@@ -7,15 +7,15 @@ import { Rol } from '@prisma/client'
 export async function POST(_: Request, { params }: { params: { id: string } }) {
   const { error, userId, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const apartado = await prisma.apartado.findUnique({
     where: { id: params.id },
     include: { items: true },
   })
 
-  if (!apartado) return errorResponse('Apartado no encontrado', 'NOT_FOUND', 404)
-  if (apartado.estado !== 'ACTIVO') return errorResponse('El apartado no está activo', 'INVALID_STATE', 409)
+  if (!apartado) return errorResponse('Reserve not found', 'NOT_FOUND', 404)
+  if (apartado.estado !== 'ACTIVO') return errorResponse('Reserve is not active', 'INVALID_STATE', 409)
 
   const fifoResults = await Promise.all(
     apartado.items.map((item) => calcularFIFO(item.articuloId, item.cantidad))

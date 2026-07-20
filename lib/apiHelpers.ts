@@ -8,14 +8,14 @@ type NextRequest = Request
 export async function requireAuth(minRol?: Rol) {
   const session = await getServerSession(authOptions)
   if (!session?.user) {
-    return { session: null, error: errorResponse('No autenticado', 'UNAUTHORIZED', 401) }
+    return { session: null, error: errorResponse('Not authenticated', 'UNAUTHORIZED', 401) }
   }
 
   const userRol = (session.user as any).rol as Rol
   const rolOrder: Rol[] = [Rol.USUARIO, Rol.ALMACENISTA, Rol.ADMIN]
 
   if (minRol && rolOrder.indexOf(userRol) < rolOrder.indexOf(minRol)) {
-    return { session: null, error: errorResponse('Sin permiso suficiente', 'FORBIDDEN', 403) }
+    return { session: null, error: errorResponse('Insufficient permissions', 'FORBIDDEN', 403) }
   }
 
   return { session, userId: (session.user as any).id as string, rol: userRol, error: null }

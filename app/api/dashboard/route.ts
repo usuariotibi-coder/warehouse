@@ -8,7 +8,7 @@ import { startOfMonth } from 'date-fns'
 export async function GET() {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const ahora = new Date()
   const inicioMes = startOfMonth(ahora)

@@ -35,7 +35,7 @@ export default function ProyectoDetailPage() {
   }, [id])
 
   if (loading) return <SkeletonCard />
-  if (!proyecto) return <p style={{ color: 'var(--text-muted)' }}>Proyecto no encontrado</p>
+  if (!proyecto) return <p style={{ color: 'var(--text-muted)' }}>Project not found</p>
 
   return (
     <div className="space-y-5 max-w-4xl">
@@ -47,13 +47,13 @@ export default function ProyectoDetailPage() {
               <h2 className="font-display text-2xl font-bold">{proyecto.nombre}</h2>
               {proyecto.responsable && (
                 <p className="text-sm mt-0.5" style={{ color: 'var(--text-secondary)' }}>
-                  Responsable: {proyecto.responsable}
+                  Manager: {proyecto.responsable}
                 </p>
               )}
             </div>
           </div>
           <div className="text-right">
-            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Costo total FIFO</p>
+            <p className="text-xs uppercase tracking-wider mb-1" style={{ color: 'var(--text-muted)' }}>Total FIFO cost</p>
             <p className="font-mono-data text-2xl font-bold" style={{ color: 'var(--accent-primary)' }}>
               {formatCurrency(proyecto.costoTotal)}
             </p>
@@ -64,13 +64,13 @@ export default function ProyectoDetailPage() {
       <div>
         <h3 className="font-display font-semibold text-sm uppercase tracking-widest mb-3"
           style={{ color: 'var(--text-muted)' }}>
-          Historial de salidas ({proyecto.salidas.length})
+          Exit history ({proyecto.salidas.length})
         </h3>
         <div className="card-industrial overflow-hidden">
           <table className="w-full text-sm">
             <thead>
               <tr style={{ borderBottom: '1px solid var(--border)' }}>
-                {['Fecha', 'Artículos', 'Costo FIFO', 'Usuario'].map((h) => (
+                {['Date', 'Items', 'FIFO Cost', 'User'].map((h) => (
                   <th key={h} className="px-4 py-3 text-left text-xs uppercase tracking-wider"
                     style={{ color: 'var(--text-muted)' }}>{h}</th>
                 ))}

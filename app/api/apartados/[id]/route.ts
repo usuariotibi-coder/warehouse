@@ -8,9 +8,9 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
   if (error) return error
 
   const apartado = await prisma.apartado.findUnique({ where: { id: params.id } })
-  if (!apartado) return errorResponse('Apartado no encontrado', 'NOT_FOUND', 404)
+  if (!apartado) return errorResponse('Reserve not found', 'NOT_FOUND', 404)
   if (apartado.usuarioId !== userId && rol !== Rol.ADMIN) {
-    return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+    return errorResponse('No permission', 'FORBIDDEN', 403)
   }
 
   const body = await req.json()
@@ -27,9 +27,9 @@ export async function DELETE(_: Request, { params }: { params: { id: string } })
   if (error) return error
 
   const apartado = await prisma.apartado.findUnique({ where: { id: params.id } })
-  if (!apartado) return errorResponse('Apartado no encontrado', 'NOT_FOUND', 404)
+  if (!apartado) return errorResponse('Reserve not found', 'NOT_FOUND', 404)
   if (apartado.usuarioId !== userId && rol !== Rol.ADMIN) {
-    return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+    return errorResponse('No permission', 'FORBIDDEN', 403)
   }
 
   await prisma.apartado.update({

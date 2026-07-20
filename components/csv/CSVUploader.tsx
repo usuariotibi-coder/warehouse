@@ -24,9 +24,9 @@ const TEMPLATE_URLS: Record<TipoCSV, string> = {
 }
 
 const TIPO_LABELS: Record<TipoCSV, string> = {
-  entrada: 'Entradas',
-  salida: 'Salidas',
-  apartado: 'Apartados',
+  entrada: 'Entries',
+  salida: 'Exits',
+  apartado: 'Reserves',
 }
 
 const ROW_COLORS: Record<CSVRowValidated['status'], string> = {
@@ -83,7 +83,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
     setDragging(false)
     const file = e.dataTransfer.files[0]
     if (file?.name.endsWith('.csv')) procesarArchivo(file)
-    else toast.error('Solo se aceptan archivos .csv')
+    else toast.error('Only .csv files accepted')
   }, [tipo])
 
   function toggleFila(rowNumber: number) {
@@ -122,7 +122,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
           },
         }
       })
-    if (!filasSeleccionadas.length) { toast.error('No hay filas seleccionadas'); return }
+    if (!filasSeleccionadas.length) { toast.error('No rows selected'); return }
 
     setProcessing(true)
     const res = await fetch('/api/csv/procesar', {
@@ -132,7 +132,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
     })
     if (res.ok) {
       const data = await res.json()
-      toast.success(`${data.procesadas} ${TIPO_LABELS[tipo].toLowerCase()} procesadas correctamente`)
+      toast.success(`${data.procesadas} ${TIPO_LABELS[tipo].toLowerCase()} processed successfully`)
       onProcesado()
       onClose()
     } else {
@@ -153,7 +153,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
       {/* Header */}
       <div className="flex items-center justify-between px-5 py-4"
         style={{ borderBottom: '1px solid var(--border)' }}>
-        <h3 className="font-display font-semibold">Cargar CSV — {TIPO_LABELS[tipo]}</h3>
+        <h3 className="font-display font-semibold">Upload CSV — {TIPO_LABELS[tipo]}</h3>
         <button onClick={onClose} style={{ color: 'var(--text-muted)' }} className="hover:text-white transition-colors">
           <X size={18} />
         </button>
@@ -172,7 +172,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                 {n}
               </span>
               <span className="text-xs" style={{ color: paso >= n ? 'var(--text-primary)' : 'var(--text-muted)' }}>
-                {n === 1 ? 'Plantilla' : n === 2 ? 'Cargar' : 'Revisar'}
+                {n === 1 ? 'Template' : n === 2 ? 'Upload' : 'Review'}
               </span>
             </div>
             {i < 2 && <ChevronRight size={12} style={{ color: 'var(--text-muted)' }} />}
@@ -185,7 +185,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
         {paso === 1 && (
           <div className="space-y-4">
             <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-              Descarga la plantilla CSV con el formato correcto para {TIPO_LABELS[tipo].toLowerCase()}.
+              Download the CSV template with the correct format for {TIPO_LABELS[tipo].toLowerCase()}.
             </p>
             <a
               href={TEMPLATE_URLS[tipo]}
@@ -195,14 +195,14 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
             >
               <Download size={20} style={{ color: 'var(--accent-cyan)' }} />
               <div>
-                <p className="text-sm font-medium">Plantilla {TIPO_LABELS[tipo]}</p>
+                <p className="text-sm font-medium">{TIPO_LABELS[tipo]} Template</p>
                 <p className="text-xs" style={{ color: 'var(--text-muted)' }}>
                   template-{tipo === 'entrada' ? 'entradas' : tipo === 'salida' ? 'salidas' : 'apartados'}.csv
                 </p>
               </div>
             </a>
             <Button className="w-full" onClick={() => setPaso(2)}>
-              Continuar <ChevronRight size={14} />
+              Continue <ChevronRight size={14} />
             </Button>
           </div>
         )}
@@ -211,7 +211,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                Arrastra tu archivo CSV o haz clic para seleccionarlo.
+                Drag your CSV file or click to select it.
               </p>
               <a
                 href={TEMPLATE_URLS[tipo]}
@@ -220,7 +220,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                 style={{ color: 'var(--accent-cyan)' }}
               >
                 <Download size={12} />
-                Descargar plantilla
+                Download template
               </a>
             </div>
             <div
@@ -236,9 +236,9 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
             >
               <Upload size={32} style={{ color: dragging ? 'var(--accent-primary)' : 'var(--text-muted)' }} />
               <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                {dragging ? 'Suelta el archivo aquí' : 'Arrastra el CSV o haz clic para buscar'}
+                {dragging ? 'Drop the file here' : 'Drag your CSV or click to browse'}
               </p>
-              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Solo archivos .csv</p>
+              <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Only .csv files</p>
             </div>
             <input
               ref={fileRef}
@@ -248,7 +248,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
               onChange={(e) => { const f = e.target.files?.[0]; if (f) procesarArchivo(f) }}
             />
             {validating && (
-              <p className="text-sm text-center" style={{ color: 'var(--text-muted)' }}>Validando filas...</p>
+              <p className="text-sm text-center" style={{ color: 'var(--text-muted)' }}>Validating rows...</p>
             )}
           </div>
         )}
@@ -257,10 +257,10 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
           <div className="space-y-4">
             {/* Resumen */}
             <div className="flex gap-4 text-sm">
-              <span style={{ color: 'var(--text-muted)' }}>{filas.length} filas totales</span>
-              <span style={{ color: '#00e676' }}>✓ {validas} válidas</span>
-              {warnings > 0 && <span style={{ color: 'var(--accent-warning)' }}>⚠ {warnings} con advertencia</span>}
-              {errores > 0 && <span style={{ color: 'var(--accent-danger)' }}>✗ {errores} con error</span>}
+              <span style={{ color: 'var(--text-muted)' }}>{filas.length} total rows</span>
+              <span style={{ color: '#00e676' }}>✓ {validas} valid</span>
+              {warnings > 0 && <span style={{ color: 'var(--accent-warning)' }}>⚠ {warnings} with warning</span>}
+              {errores > 0 && <span style={{ color: 'var(--accent-danger)' }}>✗ {errores} with error</span>}
             </div>
 
             {/* Tabla */}
@@ -302,7 +302,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                     ))}
 
                     {/* Selector de ubicación */}
-                    {fila.warnings.includes('No se especificó ubicación') && (
+                    {fila.warnings.includes('No location specified') && (
                       <div className="mt-2 flex items-center gap-2 flex-wrap">
                         <select
                           value={overrides[fila.rowNumber]?.ubicacionId ?? ''}
@@ -310,7 +310,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                           className="px-2 py-1 rounded text-xs border outline-none"
                           style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 140 }}
                         >
-                          <option value="">Seleccionar ubicación...</option>
+                          <option value="">Select location...</option>
                           {ubicaciones.map(u => <option key={u.id} value={u.id}>{u.nombre}</option>)}
                         </select>
                         {overrides[fila.rowNumber]?.ubicacionId && (
@@ -320,7 +320,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                             className="px-2 py-1 rounded text-xs border outline-none"
                             style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 120 }}
                           >
-                            <option value="">Seleccionar nivel...</option>
+                            <option value="">Select level...</option>
                             {ubicaciones.find(u => u.id === overrides[fila.rowNumber]?.ubicacionId)?.niveles.map(n => (
                               <option key={n.id} value={n.id}>{n.nombre}</option>
                             ))}
@@ -330,7 +330,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                     )}
 
                     {/* Selector de nivel (ubicación ya resuelta en CSV) */}
-                    {fila.warnings.includes('No se especificó nivel') && fila.resolvedData.ubicacionId && (
+                    {fila.warnings.includes('No level specified') && fila.resolvedData.ubicacionId && (
                       <div className="mt-2">
                         <select
                           value={overrides[fila.rowNumber]?.nivelId ?? ''}
@@ -338,7 +338,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                           className="px-2 py-1 rounded text-xs border outline-none"
                           style={{ background: 'var(--bg-primary)', borderColor: 'var(--border)', color: 'var(--text-primary)', minWidth: 140 }}
                         >
-                          <option value="">Seleccionar nivel...</option>
+                          <option value="">Select level...</option>
                           {ubicaciones.find(u => u.id === fila.resolvedData.ubicacionId)?.niveles.map(n => (
                             <option key={n.id} value={n.id}>{n.nombre}</option>
                           ))}
@@ -350,7 +350,7 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
                       <div className="mt-1 flex items-center gap-2">
                         <span className="text-xs px-2 py-0.5 rounded-full cursor-pointer"
                           style={{ background: 'color-mix(in srgb, var(--accent-primary) 12%, transparent)', color: 'var(--accent-primary)', border: '1px solid color-mix(in srgb, var(--accent-primary) 40%, transparent)' }}>
-                          📦 Sugerido: {fila.ubicacionSugerida.ubicacionNombre}-{fila.ubicacionSugerida.nivelNombre} ({fila.ubicacionSugerida.cantidadExistente} uds ya aquí)
+                          📦 Suggested: {fila.ubicacionSugerida.ubicacionNombre}-{fila.ubicacionSugerida.nivelNombre} ({fila.ubicacionSugerida.cantidadExistente} units already here)
                         </span>
                       </div>
                     )}
@@ -373,9 +373,9 @@ export function CSVUploader({ tipo, onProcesado, onClose }: CSVUploaderProps) {
       {paso === 3 && (
         <div className="flex items-center justify-between px-5 py-4"
           style={{ borderTop: '1px solid var(--border)' }}>
-          <Button variant="ghost" onClick={onClose}>Cancelar</Button>
+          <Button variant="ghost" onClick={onClose}>Cancel</Button>
           <Button onClick={procesar} loading={processing} disabled={procesables === 0}>
-            Procesar {procesables} fila{procesables !== 1 ? 's' : ''} seleccionada{procesables !== 1 ? 's' : ''}
+            Process {procesables} selected row{procesables !== 1 ? 's' : ''}
           </Button>
         </div>
       )}

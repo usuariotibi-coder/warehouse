@@ -92,7 +92,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
     setAddingNivel(true)
     const res = await fetch(`/api/ubicaciones/${ubicacion.id}/niveles`, { method: 'POST' })
     if (res.ok) {
-      toast.success('Nivel agregado')
+      toast.success('Level added')
       onRefresh?.()
     } else {
       const err = await res.json()
@@ -105,7 +105,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
     if (!ubicacion) return
     const res = await fetch(`/api/ubicaciones/${ubicacion.id}/niveles/${nivelId}`, { method: 'DELETE' })
     if (res.ok) {
-      toast.success('Nivel eliminado')
+      toast.success('Level deleted')
       if (nivelSeleccionado === nivelId) setNivelSeleccionado(null)
       onRefresh?.()
     } else {
@@ -127,7 +127,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
   async function crearApartado() {
     if (!apartandoId) return
     if (!apartadoForm.proyectoId) {
-      toast.error('Debes seleccionar un proyecto para apartar')
+      toast.error('You must select a project to make a reservation')
       return
     }
     setSavingApartado(true)
@@ -143,7 +143,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
       }),
     })
     if (res.ok) {
-      toast.success('Apartado creado correctamente')
+      toast.success('Reserve created successfully')
       setApartandoId(null)
       onRefresh?.()
     } else {
@@ -157,12 +157,12 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
 
   return (
     <>
-      <Modal open={open} onClose={onClose} title={`Ubicación ${ubicacion.nombre}`} size="full">
+      <Modal open={open} onClose={onClose} title={`Location ${ubicacion.nombre}`} size="full">
         <div className="flex flex-col h-full gap-3">
           <div className="flex justify-end flex-shrink-0">
             <Button variant="outline" size="sm" onClick={generarQR} loading={loadingQr}>
               <QrCode size={14} />
-              {qrUrl ? 'Ver QR' : 'Generar QR'}
+              {qrUrl ? 'View QR' : 'Generate QR'}
             </Button>
           </div>
 
@@ -178,7 +178,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
             <div className="flex flex-col flex-shrink-0" style={{ width: 160, borderRight: '1px solid var(--border)', background: 'var(--bg-secondary)' }}>
               <div className="px-3 py-2 text-xs uppercase tracking-widest font-medium"
                 style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
-                Niveles
+                Levels
               </div>
               <div className="flex-1 overflow-y-auto">
                 {nivelesActivos.map((nivel) => {
@@ -217,7 +217,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
               {canEdit && (
                 <div className="p-2" style={{ borderTop: '1px solid var(--border)' }}>
                   <Button variant="ghost" size="sm" className="w-full" onClick={agregarNivel} loading={addingNivel}>
-                    <Plus size={12} /> Nivel
+                    <Plus size={12} /> Level
                   </Button>
                 </div>
               )}
@@ -227,7 +227,7 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
             <div className="flex-1 flex flex-col overflow-hidden">
               <div className="px-4 py-2 text-xs uppercase tracking-widest font-medium flex items-center gap-2"
                 style={{ color: 'var(--text-muted)', borderBottom: '1px solid var(--border)' }}>
-                Componentes
+                Components
                 {nivelActual && (
                   <span className="font-mono-data" style={{ color: 'var(--accent-primary)' }}>
                     — {ubicacion.nombre}-{nivelActual.nombre}
@@ -246,22 +246,22 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
                   >
                     {!nivelActual || nivelActual.articuloNiveles.filter(an => an.cantidad > 0).length === 0 ? (
                       <p className="text-sm text-center py-10" style={{ color: 'var(--text-muted)' }}>
-                        Sin artículos en este nivel
+                        No items at this level
                       </p>
                     ) : (
                       <table className="w-full text-sm border-collapse">
                         <thead>
                           <tr style={{ borderBottom: '1px solid var(--border)', background: 'var(--bg-tertiary)' }}>
                             <th className="text-left px-3 py-2 text-xs font-medium tracking-wider uppercase"
-                              style={{ color: 'var(--text-muted)' }}>Artículo</th>
+                              style={{ color: 'var(--text-muted)' }}>Item</th>
                             <th className="text-left px-3 py-2 text-xs font-medium tracking-wider uppercase"
-                              style={{ color: 'var(--text-muted)' }}>Marca</th>
+                              style={{ color: 'var(--text-muted)' }}>Brand</th>
                             <th className="text-right px-3 py-2 text-xs font-medium tracking-wider uppercase"
-                              style={{ color: 'var(--text-muted)' }}>Apartado</th>
+                              style={{ color: 'var(--text-muted)' }}>Reserved</th>
                             <th className="text-right px-3 py-2 text-xs font-medium tracking-wider uppercase"
-                              style={{ color: 'var(--text-muted)' }}>Disponible</th>
+                              style={{ color: 'var(--text-muted)' }}>Available</th>
                             <th className="text-left px-3 py-2 text-xs font-medium tracking-wider uppercase"
-                              style={{ color: 'var(--text-muted)' }}>Unidad</th>
+                              style={{ color: 'var(--text-muted)' }}>Unit</th>
                             <th className="px-3 py-2" style={{ width: 72 }} />
                           </tr>
                         </thead>
@@ -358,14 +358,14 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
       <Modal
         open={!!apartandoId}
         onClose={() => setApartandoId(null)}
-        title="Apartar artículo"
+        title="Reserve item"
         size="sm"
       >
         <div className="space-y-4">
           <div>
             <label className="block text-xs uppercase tracking-wider mb-1.5"
               style={{ color: 'var(--text-secondary)' }}>
-              Proyecto <span style={{ color: 'var(--accent-danger)' }}>*</span>
+              Project <span style={{ color: 'var(--accent-danger)' }}>*</span>
             </label>
             <select
               value={apartadoForm.proyectoId}
@@ -378,12 +378,12 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
             </select>
             {proyectos.length === 0 && (
               <p className="text-xs mt-1" style={{ color: 'var(--text-muted)' }}>
-                Cargando proyectos activos...
+                Loading active projects...
               </p>
             )}
           </div>
           <Input
-            label="Cantidad *"
+            label="Quantity *"
             type="number"
             min={1}
             value={apartadoForm.cantidad}
@@ -391,21 +391,21 @@ export function UbicacionDetailModal({ ubicacion, open, onClose, onRefresh, init
           />
           <div className="rounded-md px-3 py-2.5 text-sm"
             style={{ background: 'var(--bg-tertiary)', color: 'var(--text-muted)' }}>
-            Vigencia: <span style={{ color: 'var(--text-primary)' }}>7 días calendario</span>
+            Validity: <span style={{ color: 'var(--text-primary)' }}>7 calendar days</span>
           </div>
           <Input
-            label="Notas (opcional)"
+            label="Notes (optional)"
             value={apartadoForm.notas}
             onChange={(e) => setApartadoForm(f => ({ ...f, notas: e.target.value }))}
           />
           <div className="flex gap-3 justify-end">
-            <Button variant="ghost" onClick={() => setApartandoId(null)}>Cancelar</Button>
+            <Button variant="ghost" onClick={() => setApartandoId(null)}>Cancel</Button>
             <Button
               onClick={crearApartado}
               loading={savingApartado}
               disabled={!apartadoForm.proyectoId}
             >
-              <Bookmark size={14} /> Apartar
+              <Bookmark size={14} /> Reserve
             </Button>
           </div>
         </div>

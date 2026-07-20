@@ -16,13 +16,13 @@ interface ConfirmDialogProps {
 
 export function ConfirmDialog({
   open, onClose, onConfirm, title, message,
-  confirmLabel = 'Confirmar', variant = 'danger', loading,
+  confirmLabel = 'Confirm', variant = 'danger', loading,
 }: ConfirmDialogProps) {
   return (
     <Modal open={open} onClose={onClose} title={title} size="sm">
       <p className="text-sm mb-6" style={{ color: 'var(--text-secondary)' }}>{message}</p>
       <div className="flex gap-3 justify-end">
-        <Button variant="ghost" onClick={onClose} disabled={loading}>Cancelar</Button>
+        <Button variant="ghost" onClick={onClose} disabled={loading}>Cancel</Button>
         <Button variant={variant} onClick={onConfirm} loading={loading}>{confirmLabel}</Button>
       </div>
     </Modal>

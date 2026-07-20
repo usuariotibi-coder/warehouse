@@ -1,7 +1,7 @@
 import { z } from 'zod'
 
 export const ArticuloSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido'),
+  nombre: z.string().min(1, 'Name is required'),
   descripcion: z.string().optional(),
   marca: z.string().optional(),
   numeroParte: z.string().optional(),
@@ -10,13 +10,13 @@ export const ArticuloSchema = z.object({
 })
 
 export const UbicacionSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido').max(20),
+  nombre: z.string().min(1, 'Name is required').max(20),
   descripcion: z.string().optional(),
 })
 
 
 export const ProyectoSchema = z.object({
-  nombre: z.string().min(1, 'El nombre es requerido'),
+  nombre: z.string().min(1, 'Name is required'),
   descripcion: z.string().optional(),
   responsable: z.string().optional(),
   estado: z.enum(['ACTIVO', 'PAUSADO', 'CERRADO']).default('ACTIVO'),
@@ -28,12 +28,13 @@ export const LoteEntradaSchema = z.object({
   articuloId: z.string().min(1),
   ubicacionId: z.string().optional(),
   nivelId: z.string().optional(),
+  proveedorId: z.string().optional(),
   cantidadOriginal: z.number().positive(),
 })
 
 export const EntradaSchema = z.object({
   proyectoId: z.string().optional(),
-  lotes: z.array(LoteEntradaSchema).min(1, 'Debe haber al menos un artículo'),
+  lotes: z.array(LoteEntradaSchema).min(1, 'At least one item is required'),
 })
 
 export const SalidaItemSchema = z.object({
@@ -73,21 +74,21 @@ export const PrecioLoteSchema = z.object({
 
 export const CambiarPasswordSchema = z
   .object({
-    passwordActual: z.string().min(1, 'La contraseña actual es requerida'),
+    passwordActual: z.string().min(1, 'Current password is required'),
     passwordNueva: z
       .string()
-      .min(10, 'Mínimo 10 caracteres')
-      .regex(/[A-Z]/, 'Debe contener al menos una mayúscula')
-      .regex(/[a-z]/, 'Debe contener al menos una minúscula')
-      .regex(/[0-9]/, 'Debe contener al menos un número')
-      .regex(/[^A-Za-z0-9]/, 'Debe contener al menos un carácter especial'),
-    passwordConfirmar: z.string().min(1, 'Confirma la nueva contraseña'),
+      .min(10, 'Minimum 10 characters')
+      .regex(/[A-Z]/, 'Must contain at least one uppercase letter')
+      .regex(/[a-z]/, 'Must contain at least one lowercase letter')
+      .regex(/[0-9]/, 'Must contain at least one number')
+      .regex(/[^A-Za-z0-9]/, 'Must contain at least one special character'),
+    passwordConfirmar: z.string().min(1, 'Confirm new password'),
   })
   .refine((d) => d.passwordNueva === d.passwordConfirmar, {
-    message: 'Las contraseñas no coinciden',
+    message: 'Passwords do not match',
     path: ['passwordConfirmar'],
   })
   .refine((d) => d.passwordActual !== d.passwordNueva, {
-    message: 'La nueva contraseña debe ser diferente a la actual',
+    message: 'New password must be different from current',
     path: ['passwordNueva'],
   })

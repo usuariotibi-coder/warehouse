@@ -11,7 +11,7 @@ import { Rol } from '@prisma/client'
 export async function POST(req: Request) {
   const { error, userId, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const { filas, tipo, proyectoId, notas } = body as {
@@ -22,7 +22,7 @@ export async function POST(req: Request) {
   }
 
   const filasValidas = filas.filter(f => f.status !== 'error')
-  if (!filasValidas.length) return errorResponse('No hay filas válidas para procesar', 'NO_VALID_ROWS')
+  if (!filasValidas.length) return errorResponse('No valid rows to process', 'NO_VALID_ROWS')
 
   try {
     const resultado = await prisma.$transaction(async (tx) => {
@@ -32,7 +32,7 @@ export async function POST(req: Request) {
         })
 
         for (const fila of filasValidas) {
-          const { articuloId, nivelId, ubicacionId, cantidad } = fila.resolvedData
+          const { articuloId, nivelId, ubicacionId, proveedorId, cantidad } = fila.resolvedData
           if (!cantidad) continue
 
           let artId = articuloId
@@ -49,12 +49,24 @@ export async function POST(req: Request) {
             artId = art.id
           }
 
+          let provId = proveedorId || undefined
+          const proveedorNombre = fila.originalData['proveedor_nombre']?.trim()
+          if (!provId && proveedorNombre) {
+            const proveedor = await tx.proveedor.upsert({
+              where: { nombre: proveedorNombre },
+              create: { nombre: proveedorNombre },
+              update: {},
+            })
+            provId = proveedor.id
+          }
+
           await tx.loteEntrada.create({
             data: {
               entradaId: entrada.id,
               articuloId: artId,
               ubicacionId,
               nivelId,
+              proveedorId: provId,
               cantidadOriginal: cantidad,
               cantidadDisponible: cantidad,
               precioPendiente: true,
@@ -129,7 +141,7 @@ export async function POST(req: Request) {
         return { tipo: 'apartado', id: apartado.id, procesadas: filasValidas.length }
       }
 
-      throw new Error('Tipo no válido')
+      throw new Error('Invalid tipo')
     })
 
     if (resultado.tipo === 'entrada') {
@@ -139,6 +151,6 @@ export async function POST(req: Request) {
 
     return successResponse(resultado)
   } catch (err: any) {
-    return errorResponse(err.message ?? 'Error al procesar CSV', 'PROCESS_ERROR', 500)
+    return errorResponse(err.message ?? 'Error processing CSV', 'PROCESS_ERROR', 500)
   }
 }

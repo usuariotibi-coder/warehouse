@@ -36,14 +36,14 @@ export async function GET(_: Request, { params }: { params: { id: string } }) {
 
   const result = articulo ? { ...articulo, apartadoReservado: apartadoReservado._sum.cantidad ?? 0 } : null
 
-  if (!result) return errorResponse('Artículo no encontrado', 'NOT_FOUND', 404)
+  if (!result) return errorResponse('Item not found', 'NOT_FOUND', 404)
   return successResponse(result)
 }
 
 export async function PUT(req: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = ArticuloSchema.partial().safeParse(body)
@@ -56,7 +56,7 @@ export async function PUT(req: Request, { params }: { params: { id: string } }) 
 export async function DELETE(_: Request, { params }: { params: { id: string } }) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol !== Rol.ADMIN) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol !== Rol.ADMIN) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   await prisma.articulo.update({ where: { id: params.id }, data: { activo: false } })
   return successResponse({ ok: true })

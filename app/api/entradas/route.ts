@@ -10,7 +10,7 @@ import { Rol } from '@prisma/client'
 export async function GET(req: Request) {
   const { error, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const { skip, limit } = getPaginationParams(req.url)
   const { searchParams } = new URL(req.url)
@@ -35,7 +35,7 @@ export async function GET(req: Request) {
       include: {
         usuario: { select: { id: true, nombre: true } },
         proyecto: { select: { id: true, nombre: true } },
-        lotes: { include: { articulo: { select: { id: true, nombre: true, unidad: true } } } },
+        lotes: { include: { articulo: { select: { id: true, nombre: true, unidad: true, marca: true, numeroParte: true } }, proveedor: { select: { id: true, nombre: true } } } },
       },
     }),
     prisma.entrada.count({ where }),
@@ -47,7 +47,7 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   const { error, userId, rol } = await requireAuth()
   if (error) return error
-  if (rol === Rol.USUARIO) return errorResponse('Sin permiso', 'FORBIDDEN', 403)
+  if (rol === Rol.USUARIO) return errorResponse('No permission', 'FORBIDDEN', 403)
 
   const body = await req.json()
   const parsed = EntradaSchema.safeParse(body)
@@ -67,6 +67,7 @@ export async function POST(req: Request) {
           articuloId: lote.articuloId,
           ubicacionId: lote.ubicacionId,
           nivelId: lote.nivelId,
+          proveedorId: lote.proveedorId,
           cantidadOriginal: lote.cantidadOriginal,
           cantidadDisponible: lote.cantidadOriginal,
           precioPendiente: true,
@@ -77,12 +78,6 @@ export async function POST(req: Request) {
         await tx.articuloNivel.upsert({
           where: { nivelId_articuloId: { nivelId: lote.nivelId, articuloId: lote.articuloId } },
           create: { nivelId: lote.nivelId, articuloId: lote.articuloId, cantidad: lote.cantidadOriginal },
-          update: { cantidad: { increment: lote.cantidadOriginal } },
-        })
-      } else if (lote.ubicacionId) {
-        await tx.articuloUbicacion.upsert({
-          where: { articuloId_ubicacionId: { articuloId: lote.articuloId, ubicacionId: lote.ubicacionId } },
-          create: { articuloId: lote.articuloId, ubicacionId: lote.ubicacionId, cantidad: lote.cantidadOriginal },
           update: { cantidad: { increment: lote.cantidadOriginal } },
         })
       }

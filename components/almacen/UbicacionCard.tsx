@@ -141,7 +141,7 @@ export function UbicacionCard({
       {/* Fallback sin niveles */}
       {niveles.length === 0 && (
         <div className="rounded p-2" style={{ background: 'var(--bg-tertiary)' }}>
-          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Artículos</p>
+          <p className="text-xs" style={{ color: 'var(--text-muted)' }}>Items</p>
           <p className="font-mono-data text-sm font-bold" style={{ color: 'var(--accent-primary)' }}>
             {totalArticulos}
           </p>
