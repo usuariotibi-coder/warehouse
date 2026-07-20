@@ -71,10 +71,5 @@ export async function descontarStockLote(
       where: { nivelId: lote.nivelId, articuloId: lote.articuloId },
       data: { cantidad: { decrement: cantidad } },
     })
-  } else if (lote.ubicacionId) {
-    await tx.articuloUbicacion.updateMany({
-      where: { articuloId: lote.articuloId, ubicacionId: lote.ubicacionId },
-      data: { cantidad: { decrement: cantidad } },
-    })
   }
 }
